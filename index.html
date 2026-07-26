@@ -1,0 +1,1472 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-user-select:none; }
+  html,body { height:100%; }
+  body {
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+    background:linear-gradient(160deg,#141821 0%,#0d1017 100%);
+    color:#e9edf4; overflow:hidden; display:flex; flex-direction:column;
+  }
+  /* Paneller yalnızca bu alanı kaplasın; alt çubuk her zaman tıklanabilir kalsın */
+  #stage { flex:1; position:relative; overflow:hidden; display:flex; flex-direction:column; }
+  #viewport {
+    flex:1; position:relative; overflow-y:auto; overflow-x:hidden;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 88%,transparent 100%);
+    mask-image:linear-gradient(180deg,transparent 0,#000 12%,#000 88%,transparent 100%);
+  }
+  #viewport::-webkit-scrollbar { width:0; height:0; }
+  #track {
+    display:flex; flex-direction:column; align-items:center; padding:0 24px;
+  }
+  .line {
+    width:100%; text-align:center; padding:12px 8px;
+    border-radius:10px; transition:background .15s;
+  }
+  .line .en { font-size:20px; font-weight:600; letter-spacing:.2px; line-height:1.35; }
+  .line .tr { font-size:14px; color:#8b93a3; margin-top:4px; }
+  .line.spoken .en { color:#7cc4ff; }
+  .line.reading { background:rgba(124,196,255,.10); box-shadow:inset 0 0 0 1px rgba(124,196,255,.22); }
+  .line.reading .tr { color:#cfe4ff; }
+  .w { cursor:help; padding:0 1px; border-radius:4px; transition:background .1s,color .1s; }
+  .w:hover { background:rgba(124,196,255,.20); color:#bfe0ff; }
+  .head { padding:26px 8px 8px; }
+  .head .en { font-size:24px; font-weight:800; color:#7cc4ff; }
+  .head .tr { font-size:13px; color:#6f7787; margin-top:3px; letter-spacing:.3px; }
+  .lv {
+    display:inline-block; font-size:10px; font-weight:800; color:#0d1017;
+    border-radius:5px; padding:2px 8px; margin-bottom:9px; letter-spacing:1px;
+  }
+  .a1 .lv{background:#7ee0a6} .a2 .lv{background:#7cc4ff} .b1 .lv{background:#f0b46e} .custom .lv{background:#c9a0ff}
+  .dot { color:#3a4150; font-size:15px; padding:8px 0; }
+  .empty { padding:54px 24px; text-align:center; color:#8b93a3; }
+  .empty .big { font-size:34px; margin-bottom:10px; }
+  .empty .t1 { font-size:16px; color:#e9edf4; font-weight:700; }
+  .empty .t2 { font-size:13px; margin:8px 0 16px; }
+  #editor {
+    position:absolute; inset:0; z-index:50; display:none; flex-direction:column;
+    background:rgba(10,13,20,.98); padding:16px 18px; overflow:auto;
+  }
+  #editor h2 { font-size:17px; }
+  #editor .sub { font-size:11px; color:#8b93a3; margin:4px 0 14px; line-height:1.4; }
+  #editor label { font-size:11px; color:#9aa3b2; font-weight:700; display:block; margin-bottom:5px; }
+  #editor input, #editor textarea {
+    width:100%; background:#12161f; border:1px solid rgba(255,255,255,.12); border-radius:8px;
+    color:#e9edf4; padding:8px 10px; font-size:13px; font-family:inherit; margin-bottom:12px;
+  }
+  #editor textarea { min-height:88px; resize:vertical; line-height:1.45; }
+  #editor input:focus, #editor textarea:focus { outline:none; border-color:#7cc4ff; }
+  .erow { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+  #status { font-size:11px; color:#7cc4ff; }
+  #library, #voice {
+    position:absolute; inset:0; z-index:55; display:none; flex-direction:column;
+    background:rgba(10,13,20,.98); padding:16px 18px; overflow:auto;
+  }
+  .libhead { display:flex; align-items:center; }
+  .libhead h2 { font-size:17px; flex:1; }
+  .libhead .x { background:none; border:none; color:#9aa3b2; font-size:15px; cursor:pointer; }
+  .librow { display:flex; gap:8px; margin:12px 0; }
+  .story-card {
+    background:#12161f; border:1px solid rgba(255,255,255,.1); border-radius:12px;
+    padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .15s, background .15s;
+  }
+  .story-card:hover { border-color:#7cc4ff; background:#161b26; }
+  .story-card .st { font-size:15px; font-weight:700; color:#e9edf4; }
+  .story-card .sc { font-size:11px; color:#6f7787; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .story-card .acts { margin-top:9px; display:flex; gap:8px; }
+  .story-card .mini {
+    font-size:11px; border:1px solid rgba(255,255,255,.14); background:transparent; color:#9aa3b2;
+    border-radius:7px; padding:3px 10px; cursor:pointer;
+  }
+  .story-card .mini:hover { color:#e9edf4; border-color:#7cc4ff; }
+  .story-card .mini.del:hover { color:#ff8a8a; border-color:#ff8a8a; }
+  .libempty { text-align:center; color:#8b93a3; padding:44px 12px; line-height:1.6; font-size:13px; }
+  #tip {
+    position:fixed; z-index:99; pointer-events:none; opacity:0;
+    background:#eaf3ff; color:#0d1017; font-size:13px; font-weight:700;
+    padding:5px 10px; border-radius:8px; white-space:nowrap;
+    box-shadow:0 6px 18px rgba(0,0,0,.45); transition:opacity .1s; transform:translate(-50%,-100%);
+  }
+  #tip::after {
+    content:""; position:absolute; left:50%; top:100%; transform:translateX(-50%);
+    border:5px solid transparent; border-top-color:#eaf3ff;
+  }
+  /* Seslendirme paneli */
+  .vrow { display:flex; align-items:center; gap:8px; margin-bottom:11px; flex-wrap:wrap; }
+  .vrow .lbl { font-size:11px; color:#9aa3b2; font-weight:700; flex:0 0 82px; }
+  .vrow .val { font-size:11px; color:#7cc4ff; font-weight:700; flex:0 0 44px; text-align:right; }
+  #voice select {
+    flex:1; min-width:0; background:#12161f; border:1px solid rgba(255,255,255,.12);
+    border-radius:8px; color:#e9edf4; padding:5px 8px; font-size:12px; font-family:inherit;
+  }
+  #voice input[type=range] { flex:1; min-width:0; accent-color:#7cc4ff; }
+  #voice .big-btn { width:100%; height:36px; font-size:13px; font-weight:700; margin-bottom:14px; }
+  #voice .note {
+    font-size:11px; color:#9aa3b2; line-height:1.55; margin-top:4px;
+    background:rgba(124,196,255,.07); border:1px solid rgba(124,196,255,.16);
+    border-radius:9px; padding:9px 11px;
+  }
+  /* PDF sürükle-bırak göstergesi ve bildirim balonu */
+  #droplay {
+    position:absolute; inset:0; z-index:80; display:none;
+    align-items:center; justify-content:center; flex-direction:column; gap:10px;
+    background:rgba(10,13,20,.92); border:2px dashed #7cc4ff; border-radius:14px;
+    color:#e9edf4; font-size:15px; font-weight:700; text-align:center; padding:20px;
+  }
+  #droplay .big { font-size:40px; }
+  #droplay .sub2 { font-size:12px; font-weight:500; color:#9aa3b2; }
+  #toast {
+    position:fixed; left:50%; bottom:86px; transform:translateX(-50%); z-index:120;
+    background:#eaf3ff; color:#0d1017; font-size:12px; font-weight:700; line-height:1.45;
+    padding:9px 14px; border-radius:10px; max-width:84%; text-align:center;
+    box-shadow:0 8px 22px rgba(0,0,0,.5); opacity:0; pointer-events:none; transition:opacity .18s;
+  }
+  #bar {
+    flex:0 0 auto; display:flex; flex-direction:column; gap:6px;
+    padding:7px 12px; background:rgba(0,0,0,.28); border-top:1px solid rgba(255,255,255,.06);
+  }
+  .brow { display:flex; align-items:center; gap:6px; width:100%; }
+  /* seviye çipleri: dar ekranda yana kayar, "Ekle" düğmesi hep görünür kalır */
+  .chips {
+    display:flex; align-items:center; gap:6px; flex:1 1 auto; min-width:0;
+    overflow-x:auto; overflow-y:hidden; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .chips::-webkit-scrollbar { height:0; }
+  .btn, .chip { flex:0 0 auto; }
+  .btn {
+    border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05);
+    color:#e9edf4; border-radius:8px; height:26px; padding:0 11px; font-size:12px;
+    cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:4px;
+  }
+  .btn:hover{background:rgba(255,255,255,.12)}
+  .btn.play{width:36px; font-size:14px}
+  .chip {
+    border:1px solid rgba(255,255,255,.12); background:transparent; color:#9aa3b2;
+    border-radius:20px; height:24px; padding:0 13px; font-size:11px; font-weight:700; cursor:pointer;
+  }
+  .chip.on{background:#7cc4ff; color:#0d1017; border-color:#7cc4ff}
+  .btn.on{background:#7cc4ff; color:#0d1017; border-color:#7cc4ff; font-weight:700}
+  .sep{flex:1}
+  /* Dokunmatik (iPad): Apple'ın önerdiği 44pt dokunma hedefi */
+  @media (hover: none) {
+    #bar { padding:10px 14px; gap:10px; }
+    .brow { gap:10px; }
+    .btn { height:46px; min-width:46px; padding:0 18px; font-size:15px; border-radius:12px; }
+    .btn.play { width:58px; font-size:19px; }
+    .chip { height:44px; padding:0 20px; font-size:14px; border-radius:22px; }
+    .story-card { padding:16px 18px; }
+    .story-card .mini { height:42px; font-size:14px; padding:0 16px; border-radius:11px; }
+    .story-card .acts { gap:12px; margin-top:14px; }
+    .libhead .x { font-size:26px; padding:8px 14px; margin:-8px -10px; }
+    .vrow { gap:12px; margin-bottom:16px; }
+    .vrow .lbl { flex-basis:96px; font-size:13px; }
+    .vrow .val { font-size:13px; flex-basis:56px; }
+    /* NOT: dokunmatikte yazı/seçim alanları 16px'in ALTINDA olursa iOS odaklanınca
+       sayfayı otomatik yakınlaştırır ve düzen taşar — bu yüzden hepsi en az 16px. */
+    #voice select { padding:12px 12px; font-size:16px; border-radius:11px; }
+    #voice input[type=range] { height:36px; }
+    #voice .big-btn { height:52px; font-size:16px; border-radius:13px; }
+    #editor input, #editor textarea { padding:12px; font-size:16px; }
+    .hint { font-size:12px; }
+    * { -webkit-touch-callout:none; }
+  }
+  /* Dar ekran (iPhone): çubuk taşmasın, yazı boyutları ekrana otursun */
+  @media (max-width: 520px) {
+    #bar { padding:8px 10px; gap:8px; }
+    .brow { gap:8px; }
+    #bar .hint { display:none; }                 /* dokunmatikte zaten "üstüne gelme" yok */
+    .btn { height:42px; min-width:42px; padding:0 13px; font-size:14px; border-radius:11px; }
+    .btn.play { width:50px; font-size:17px; }
+    .chips { gap:8px; }
+    .chip { height:40px; padding:0 15px; font-size:13px; }
+    .sep { flex:0 0 6px; }
+    #track { padding:0 14px; }
+    .line { padding:10px 4px; }
+    .line .en { font-size:18px; }
+    .line .tr { font-size:13px; }
+    .head { padding:20px 4px 6px; }
+    .head .en { font-size:21px; }
+    #toast { bottom:118px; font-size:12px; }
+    /* panellerde etiket üstte, denetim altta (yan yana sığmıyor) */
+    #voice, #library, #editor { padding:14px 14px; }
+    .vrow { margin-bottom:14px; }
+    .vrow .lbl { flex:0 0 100%; margin-bottom:2px; }
+    .vrow .val { flex:0 0 auto; }
+    #voice select { flex:1 1 100%; }
+    #voice input[type=range] { flex:1 1 60%; }
+    /* editör dar ekranda: alanlar 16px (iOS yakınlaştırmasın), başlıklar küçülsün */
+    #editor h2 { font-size:16px; }
+    #editor .sub, #library .sub, #voice .sub { font-size:11px; margin-bottom:10px; }
+    #editor input, #editor textarea, #voice select { font-size:16px; }
+    #editor textarea { min-height:110px; }
+    #editor label { font-size:12px; }
+    .erow { gap:10px; }
+    .libhead h2 { font-size:16px; }
+  }
+  .hint{font-size:10px; color:#5f6878; flex:1; text-align:center; overflow:hidden; white-space:nowrap}
+</style><title>Akan İngilizce</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Akan İngilizce">
+<meta name="theme-color" content="#0d1017">
+</head>
+<body>
+  <div id="stage">
+  <div id="viewport"><div id="track"></div></div>
+  <div id="droplay">
+    <div class="big">&#128196;</div>
+    <div>Bırak, yazıya çevireyim</div>
+    <div class="sub2">PDF veya metin dosyası · cümlelere bölüp akan hikâye yaparım</div>
+  </div>
+  <div id="tip"></div>
+  <div id="editor">
+    <h2>Kendi Hikâyeni Ekle</h2>
+    <div class="sub">Her satır bir cümle. İngilizce ve Türkçe satırlar sırayla eşleşir; kaydedince altında çevirisiyle akmaya başlar. İnternet varsa "Otomatik Çevir" Türkçeyi doldurur, sonra istediğin gibi düzeltebilirsin.</div>
+    <label>Başlık</label>
+    <input id="cTitle" placeholder="Örn: My Weekend" maxlength="60">
+    <label>İngilizce metin (her satıra bir cümle)</label>
+    <textarea id="cEn" placeholder="I woke up early.&#10;I made a big breakfast.&#10;Then I called my friend."></textarea>
+    <div class="erow">
+      <button class="btn" id="autoBtn">&#127760; Otomatik Çevir (EN&rarr;TR)</button>
+      <span id="status"></span>
+    </div>
+    <label>Türkçe çeviri (satırlar eşleşir)</label>
+    <textarea id="cTr" placeholder="Erken uyandım.&#10;Büyük bir kahvaltı yaptım.&#10;Sonra arkadaşımı aradım."></textarea>
+    <div class="erow">
+      <button class="btn" id="saveBtn" style="background:#7cc4ff;color:#0d1017;border-color:#7cc4ff;font-weight:700">Kaydet ve Akıt</button>
+      <button class="btn" id="cancelBtn">Kapat</button>
+    </div>
+  </div>
+  <div id="library">
+    <div class="libhead"><h2>Kitaplığım</h2><button class="x" id="libClose">&#10005;</button></div>
+    <div class="sub">Eklediğin hikâyeler burada durur. Birine bas → o hikâye akmaya başlar. PDF'i doğrudan pencereye sürükleyip bırakabilirsin.</div>
+    <div class="librow">
+      <button class="btn" id="libNew">&#9998; Yeni Hikâye</button>
+      <button class="btn" id="libPdf">&#128196; PDF'ten Al</button>
+      <button class="btn" id="libAll">&#128256; Hepsi (karışık)</button>
+      <button class="btn" id="libBackup">&#8617; Yedekler</button>
+    </div>
+    <div id="libList"></div>
+  </div>
+  <div id="voice">
+    <div class="libhead"><h2>Seslendirme</h2><button class="x" id="voiceClose">&#10005;</button></div>
+    <div class="sub">Hikâyeyi sesli okur; okunan satır ortada tutulur ve akış sesin hızına uyar. Bir satıra tıklarsan oradan devam eder.</div>
+    <button class="btn big-btn" id="narrToggle">&#9654; Seslendirmeyi Başlat</button>
+    <div class="vrow">
+      <span class="lbl">Okunacak</span>
+      <button class="chip vmode" data-m="en">&Uuml;st sat&#305;r</button>
+      <button class="chip vmode" data-m="tr">Alt sat&#305;r</button>
+      <button class="chip vmode" data-m="both">&#304;kisi</button>
+    </div>
+    <div class="vrow">
+      <span class="lbl">Dil</span>
+      <select id="vLang"></select>
+    </div>
+    <div class="vrow">
+      <span class="lbl">Ses</span>
+      <button class="chip vgen" data-g="female">Kad&#305;n</button>
+      <button class="chip vgen" data-g="male">Erkek</button>
+    </div>
+    <div class="vrow">
+      <span class="lbl">Hız</span>
+      <input type="range" id="vRate" min="0.8" max="2" step="0.05">
+      <span class="val" id="vRateVal">1&times;</span>
+    </div>
+    <div class="vrow">
+      <span class="lbl">Ton</span>
+      <input type="range" id="vTrim" min="0.7" max="1.3" step="0.02">
+      <span class="val" id="vTrimVal">1.00</span>
+    </div>
+    <div class="vrow">
+      <span class="lbl">Ses se&ccedil;imi</span>
+      <select id="vVoice"></select>
+    </div>
+    <div class="vrow">
+      <button class="btn" id="vTest">&#128264; Dene</button>
+      <span class="hint" style="text-align:left">Hız: akarken &minus; / + tuşları da ses hızını değiştirir</span>
+    </div>
+    <div class="note" id="vNote"></div>
+    <div class="vrow" id="vGetRow" style="display:none; margin-top:10px">
+      <button class="btn" id="vGetVoices">&#11015; Ses İndirme Ayarlarını Aç</button>
+      <button class="btn" id="vRefresh">&#8635; Sesleri Yenile</button>
+    </div>
+  </div>
+  </div>
+  <div id="toast"></div>
+  <div id="bar">
+    <div class="brow">
+      <button class="btn play" id="playBtn" title="Duraklat/Oynat">&#9208;</button>
+      <button class="btn" id="slower" title="Yavaşlat">&minus;</button>
+      <button class="btn" id="faster" title="Hızlandır">+</button>
+      <button class="btn" id="shuffleBtn" title="Karıştır">&#8635;</button>
+      <span class="hint" id="hint">kelimeye gel &middot; &#8597; geri kaydır</span>
+      <button class="btn" id="narrBtn" title="Sesli okumayı aç/kapat (S)">&#128266;</button>
+      <button class="btn" id="voiceBtn" title="Seslendirme ayarları">Ses</button>
+    </div>
+    <div class="brow">
+      <div class="chips">
+        <button class="chip on" data-lv="all">Karışık</button>
+        <button class="chip" data-lv="a1">A1</button>
+        <button class="chip" data-lv="a2">A2</button>
+        <button class="chip" data-lv="b1">B1</button>
+        <button class="chip" data-lv="custom">Benim</button>
+      </div>
+      <button class="btn" id="addBtn" title="Kendi hikâyeni ekle">&#9998; Ekle</button>
+    </div>
+  </div>
+<script>
+const STORIES = [
+  { lv:"a1", title:"Lucy and Her Dog", ttr:"Lucy ve Köpeği", lines:[
+    ["Lucy is a little girl.","Lucy küçük bir kızdır."],
+    ["She has a small brown dog.","Onun küçük, kahverengi bir köpeği var."],
+    ["The dog's name is Max.","Köpeğin adı Max."],
+    ["Every morning they go to the park.","Her sabah parka giderler."],
+    ["Lucy throws a ball.","Lucy bir top atar."],
+    ["Max runs and brings it back.","Max koşar ve onu geri getirir."],
+    ["They play together for an hour.","Bir saat birlikte oynarlar."],
+    ["Then Lucy gives Max some food and water.","Sonra Lucy Max'e biraz yemek ve su verir."],
+    ["At night, Max sleeps next to her bed.","Geceleri Max onun yatağının yanında uyur."],
+    ["Lucy loves Max very much.","Lucy Max'i çok sever."],
+  ]},
+  { lv:"a1", title:"My Morning", ttr:"Sabahım", lines:[
+    ["I wake up at seven o'clock.","Saat yedide uyanırım."],
+    ["I open the window and look outside.","Pencereyi açar ve dışarı bakarım."],
+    ["I brush my teeth and wash my face.","Dişlerimi fırçalar ve yüzümü yıkarım."],
+    ["Then I make a cup of tea.","Sonra bir bardak çay yaparım."],
+    ["I eat bread, cheese, and eggs.","Ekmek, peynir ve yumurta yerim."],
+    ["My cat sits next to me.","Kedim yanıma oturur."],
+    ["I put on my jacket and shoes.","Ceketimi ve ayakkabılarımı giyerim."],
+    ["I say goodbye to my family.","Aileme hoşça kal derim."],
+    ["I walk to the bus stop.","Otobüs durağına yürürüm."],
+    ["A new day begins.","Yeni bir gün başlar."],
+  ]},
+  { lv:"a1", title:"My Best Friend", ttr:"En İyi Arkadaşım", lines:[
+    ["Ali is my best friend.","Ali benim en iyi arkadaşımdır."],
+    ["We are in the same class.","Aynı sınıftayız."],
+    ["He is tall and very funny.","O uzun boylu ve çok komiktir."],
+    ["We play football after school.","Okuldan sonra futbol oynarız."],
+    ["He likes to draw pictures.","Resim çizmeyi sever."],
+    ["I help him with his math.","Ona matematiğinde yardım ederim."],
+    ["We eat lunch together every day.","Her gün birlikte öğle yemeği yeriz."],
+    ["Sometimes we watch films at home.","Bazen evde film izleriz."],
+    ["Good friends are very important.","İyi arkadaşlar çok önemlidir."],
+    ["I am happy to have Ali.","Ali'ye sahip olduğum için mutluyum."],
+  ]},
+  { lv:"a2", title:"A Rainy Day Trip", ttr:"Yağmurlu Bir Gün Gezisi", lines:[
+    ["Last weekend, we planned a trip to the mountains.","Geçen hafta sonu dağlara bir gezi planladık."],
+    ["We woke up early and packed our bags.","Erken kalktık ve çantalarımızı topladık."],
+    ["But when we left home, it started to rain.","Ama evden çıktığımızda yağmur başladı."],
+    ["The roads were wet and the sky was grey.","Yollar ıslaktı ve gökyüzü griydi."],
+    ["My friend wanted to go back home.","Arkadaşım eve dönmek istedi."],
+    ["I said, 'Let us wait for an hour.'","'Bir saat bekleyelim,' dedim."],
+    ["Soon, the rain stopped and the sun came out.","Kısa süre sonra yağmur durdu ve güneş çıktı."],
+    ["We continued our trip and reached the top.","Gezimize devam ettik ve zirveye ulaştık."],
+    ["The view was beautiful after the rain.","Yağmurdan sonra manzara çok güzeldi."],
+    ["We took many photos and had lunch there.","Birçok fotoğraf çektik ve orada öğle yemeği yedik."],
+    ["It became the best day of our holiday.","Tatilimizin en güzel günü oldu."],
+  ]},
+  { lv:"a2", title:"The Lost Wallet", ttr:"Kayıp Cüzdan", lines:[
+    ["Yesterday, Emma lost her wallet in the city.","Dün Emma cüzdanını şehirde kaybetti."],
+    ["She looked for it everywhere.","Onu her yerde aradı."],
+    ["There was money and her ID card inside.","İçinde para ve kimlik kartı vardı."],
+    ["She felt worried and sad.","Endişeli ve üzgün hissetti."],
+    ["A young boy found the wallet on a bench.","Genç bir çocuk cüzdanı bir bankta buldu."],
+    ["He looked at the ID card and found her address.","Kimlik kartına baktı ve adresini buldu."],
+    ["He brought the wallet to her house.","Cüzdanı onun evine getirdi."],
+    ["Emma was very happy and thankful.","Emma çok mutlu ve minnettardı."],
+    ["She gave the boy some money as a gift.","Çocuğa hediye olarak biraz para verdi."],
+    ["He smiled and went back home.","Gülümsedi ve evine döndü."],
+  ]},
+  { lv:"a2", title:"The Broken Phone", ttr:"Kırık Telefon", lines:[
+    ["Last month, my phone fell on the floor.","Geçen ay telefonum yere düştü."],
+    ["The screen broke into small pieces.","Ekran küçük parçalara ayrıldı."],
+    ["I could not call anyone.","Kimseyi arayamıyordum."],
+    ["I took it to a repair shop.","Onu bir tamir dükkânına götürdüm."],
+    ["The man there was very kind.","Oradaki adam çok kibardı."],
+    ["He fixed the screen in one hour.","Ekranı bir saatte tamir etti."],
+    ["It did not cost too much money.","Çok fazla paraya mal olmadı."],
+    ["I was really happy with the result.","Sonuçtan gerçekten memnundum."],
+    ["Now I use a strong case for my phone.","Şimdi telefonum için sağlam bir kılıf kullanıyorum."],
+    ["I am more careful than before.","Eskisinden daha dikkatliyim."],
+  ]},
+  { lv:"b1", title:"The Job Interview", ttr:"İş Görüşmesi", lines:[
+    ["Daniel had been looking for a job for months.","Daniel aylardır iş arıyordu."],
+    ["One morning, he received an important email.","Bir sabah önemli bir e-posta aldı."],
+    ["A well-known company wanted to meet him.","Tanınmış bir şirket onunla görüşmek istiyordu."],
+    ["He was nervous, but he prepared carefully.","Gergindi ama dikkatlice hazırlandı."],
+    ["On the day of the interview, he arrived early.","Görüşme günü erken vardı."],
+    ["The manager asked him some difficult questions.","Müdür ona bazı zor sorular sordu."],
+    ["Instead of panicking, Daniel stayed calm.","Panik yapmak yerine Daniel sakin kaldı."],
+    ["He talked about his skills and experience.","Becerilerinden ve deneyiminden bahsetti."],
+    ["He also admitted the mistakes he had made before.","Daha önce yaptığı hataları da kabul etti."],
+    ["The manager was impressed by his honesty.","Müdür onun dürüstlüğünden etkilendi."],
+    ["A week later, they offered him the job.","Bir hafta sonra ona işi teklif ettiler."],
+    ["Daniel realized that patience had finally paid off.","Daniel sabrın sonunda karşılığını verdiğini anladı."],
+  ]},
+  { lv:"b1", title:"A New Neighbor", ttr:"Yeni Komşu", lines:[
+    ["A new family moved into the house next door.","Yan evdeki eve yeni bir aile taşındı."],
+    ["At first, nobody in the street talked to them.","Başta sokaktaki kimse onlarla konuşmadı."],
+    ["They seemed quiet and kept to themselves.","Sessiz görünüyorlardı ve kendi hâllerindeydiler."],
+    ["One evening, the power went out in the whole street.","Bir akşam tüm sokakta elektrik kesildi."],
+    ["The new neighbor came out with candles and food.","Yeni komşu mumlar ve yiyecekle dışarı çıktı."],
+    ["He invited everyone to his garden.","Herkesi bahçesine davet etti."],
+    ["People talked and laughed for hours.","İnsanlar saatlerce konuştu ve güldü."],
+    ["That night changed everything.","O gece her şeyi değiştirdi."],
+    ["Since then, the street has felt like a family.","O günden beri sokak bir aile gibi hissettiriyor."],
+    ["Sometimes a small event brings people together.","Bazen küçük bir olay insanları bir araya getirir."],
+  ]},
+  { lv:"b1", title:"Moving to a New City", ttr:"Yeni Bir Şehre Taşınmak", lines:[
+    ["Last year, Sarah moved to a new city for work.","Geçen yıl Sarah iş için yeni bir şehre taşındı."],
+    ["At first, everything felt strange to her.","Başta her şey ona garip geldi."],
+    ["She did not know anyone in the town.","Kasabada kimseyi tanımıyordu."],
+    ["The streets, the shops, and the people were all new.","Sokaklar, dükkânlar ve insanlar hep yeniydi."],
+    ["She often felt lonely in the evenings.","Akşamları sık sık yalnız hissederdi."],
+    ["So she decided to join a dance class.","Bu yüzden bir dans kursuna katılmaya karar verdi."],
+    ["There, she met people who shared her interests.","Orada ilgi alanlarını paylaşan insanlarla tanıştı."],
+    ["Slowly, the strange city became her home.","Yavaş yavaş garip şehir onun evi oldu."],
+    ["She learned that change can be a good thing.","Değişimin iyi bir şey olabileceğini öğrendi."],
+    ["Now she cannot imagine living anywhere else.","Şimdi başka bir yerde yaşamayı hayal edemiyor."],
+  ]},
+];
+
+// Kelime sözlüğü (temel biçimler; kod -s/-ed/-ing gibi ekleri otomatik dener)
+const GLOSS = {
+  a:"bir", an:"bir", the:"(belirli tanım)", and:"ve", or:"veya", but:"ama", so:"bu yüzden",
+  then:"sonra", when:"-dığında", instead:"yerine", also:"ayrıca", as:"olarak / gibi",
+  for:"için", with:"ile", to:"-e / -a", of:"-in", in:"içinde", on:"üstünde", at:"-de / -da",
+  very:"çok", much:"çok", many:"birçok", some:"biraz / bazı", all:"hepsi / tüm", too:"fazla / de",
+  more:"daha", than:"-den (karşılaştırma)", not:"değil", now:"şimdi", here:"burada", there:"orada",
+  every:"her", each:"her biri", one:"bir", good:"iyi", bad:"kötü", new:"yeni", old:"eski",
+  little:"küçük", small:"küçük", big:"büyük", tall:"uzun boylu", funny:"komik", kind:"kibar / tür",
+  strong:"güçlü / sağlam", strange:"garip", quiet:"sessiz", lonely:"yalnız", happy:"mutlu",
+  sad:"üzgün", worried:"endişeli", thankful:"minnettar", nervous:"gergin", calm:"sakin",
+  difficult:"zor", important:"önemli", beautiful:"güzel", careful:"dikkatli", carefully:"dikkatlice",
+  best:"en iyi", brown:"kahverengi", grey:"gri", wet:"ıslak", early:"erken", really:"gerçekten",
+  slowly:"yavaşça", finally:"sonunda", soon:"yakında", together:"birlikte", outside:"dışarı",
+  before:"önce", after:"sonra", since:"-den beri", sometimes:"bazen", often:"sık sık",
+  girl:"kız", boy:"çocuk (erkek)", dog:"köpek", cat:"kedi", name:"isim / ad", ball:"top",
+  morning:"sabah", evening:"akşam", night:"gece", day:"gün", week:"hafta", month:"ay (takvim)",
+  year:"yıl", hour:"saat (süre)", park:"park", home:"ev", house:"ev", bed:"yatak", window:"pencere",
+  door:"kapı", food:"yemek", water:"su", bread:"ekmek", cheese:"peynir", egg:"yumurta",
+  tea:"çay", cup:"bardak / fincan", jacket:"ceket", shoe:"ayakkabı", bus:"otobüs", stop:"durak / durmak",
+  family:"aile", friend:"arkadaş", class:"sınıf / ders", school:"okul", football:"futbol",
+  picture:"resim", math:"matematik", film:"film", trip:"gezi / yolculuk", mountain:"dağ",
+  bag:"çanta", road:"yol", sky:"gökyüzü", sun:"güneş", rain:"yağmur", view:"manzara",
+  photo:"fotoğraf", lunch:"öğle yemeği", holiday:"tatil", wallet:"cüzdan", city:"şehir", town:"kasaba",
+  money:"para", card:"kart", address:"adres", bench:"bank", gift:"hediye", phone:"telefon",
+  floor:"yer / zemin", screen:"ekran", piece:"parça", shop:"dükkân", man:"adam", result:"sonuç",
+  case:"kılıf / durum", job:"iş", email:"e-posta", company:"şirket", interview:"görüşme",
+  manager:"müdür", question:"soru", skill:"beceri", experience:"deneyim", mistake:"hata",
+  honesty:"dürüstlük", patience:"sabır", neighbor:"komşu", street:"sokak", power:"elektrik / güç",
+  candle:"mum", garden:"bahçe", event:"olay", change:"değişim / değişmek", thing:"şey",
+  interest:"ilgi alanı", dance:"dans", work:"iş / çalışmak",
+  is:"-dir", are:"-dirler", was:"-di", were:"-diler", be:"olmak", been:"olmuş", have:"sahip olmak",
+  has:"sahiptir", had:"vardı / -mişti", do:"yapmak", does:"yapar", did:"yaptı", can:"-ebilmek",
+  cannot:"-emez", could:"-ebilirdi", will:"-ecek", would:"-erdi", go:"gitmek", goes:"gider",
+  went:"gitti", come:"gelmek", came:"geldi", get:"almak / olmak", got:"aldı", give:"vermek",
+  gave:"verdi", take:"almak / çekmek", took:"aldı / çekti", make:"yapmak", made:"yaptı",
+  find:"bulmak", found:"buldu", know:"bilmek / tanımak", knew:"bildi", think:"düşünmek",
+  see:"görmek", look:"bakmak", looked:"baktı / aradı", watch:"izlemek", say:"söylemek",
+  said:"dedi", talk:"konuşmak", ask:"sormak", tell:"söylemek", meet:"buluşmak / tanışmak",
+  met:"tanıştı", play:"oynamak", run:"koşmak", walk:"yürümek", throw:"atmak", bring:"getirmek",
+  brought:"getirdi", sleep:"uyumak", eat:"yemek (fiil)", drink:"içmek", wake:"uyanmak",
+  woke:"uyandı", open:"açmak", close:"kapatmak", wash:"yıkamak", brush:"fırçalamak", sit:"oturmak",
+  put:"koymak / giymek", help:"yardım etmek", draw:"çizmek", like:"sevmek / gibi", love:"sevmek",
+  want:"istemek", wanted:"istedi", need:"ihtiyaç duymak", start:"başlamak", started:"başladı",
+  begin:"başlamak", stop:"durmak", stopped:"durdu", wait:"beklemek", continue:"devam etmek",
+  reach:"ulaşmak", plan:"planlamak", planned:"planladı", pack:"toplamak (bavul)", packed:"topladı",
+  leave:"ayrılmak / çıkmak", left:"ayrıldı / çıktı", live:"yaşamak", living:"yaşama", move:"taşınmak",
+  moved:"taşındı", decide:"karar vermek", decided:"karar verdi", join:"katılmak", share:"paylaşmak",
+  shared:"paylaştı", learn:"öğrenmek", learned:"öğrendi", imagine:"hayal etmek", become:"olmak",
+  became:"oldu", feel:"hissetmek", felt:"hissetti", seem:"görünmek", seemed:"göründü",
+  keep:"tutmak / sürdürmek", kept:"sürdürdü", call:"aramak", fall:"düşmek", fell:"düştü",
+  break:"kırmak", broke:"kırıldı", broken:"kırık", fix:"tamir etmek", fixed:"tamir etti",
+  repair:"tamir", cost:"maliyeti olmak", use:"kullanmak", receive:"almak", received:"aldı",
+  prepare:"hazırlanmak", prepared:"hazırlandı", arrive:"varmak", arrived:"vardı", stay:"kalmak",
+  stayed:"kaldı", admit:"kabul etmek", admitted:"kabul etti", impress:"etkilemek",
+  impressed:"etkilenmiş", offer:"teklif etmek", offered:"teklif etti", realize:"fark etmek",
+  realized:"anladı", panic:"panik yapmak", pay:"ödemek", paid:"ödedi", invite:"davet etmek",
+  invited:"davet etti", laugh:"gülmek", laughed:"güldü", smile:"gülümsemek", smiled:"gülümsedi",
+  changed:"değişti", people:"insanlar", person:"kişi", everyone:"herkes",
+  everything:"her şey", everywhere:"her yer", nobody:"hiç kimse", anyone:"herhangi biri",
+  anywhere:"herhangi bir yer", else:"başka", who:"kim / ki o", that:"o / ki", this:"bu",
+  next:"yanına / sonraki", back:"geri", up:"yukarı", out:"dışarı", off:"kapalı / uzağa",
+  into:"içine", about:"hakkında", first:"ilk / önce", last:"son / geçen", top:"tepe / zirve",
+  same:"aynı", another:"başka bir", whole:"tüm / bütün",
+  goodbye:"hoşça kal", face:"yüz", teeth:"dişler", them:"onları", him:"onu", her:"onun / onu",
+  his:"onun", she:"o", he:"o", they:"onlar", we:"biz", it:"o (nesne)", my:"benim", our:"bizim",
+  id:"kimlik", let:"-elim / izin vermek", us:"biz(i)",
+  i:"ben", me:"beni / bana", am:"-im (olmak)", by:"ile / tarafından", inside:"içeride / içinde",
+  later:"sonra / daha sonra", lost:"kaybetti", young:"genç", weekend:"hafta sonu",
+  yesterday:"dün", seven:"yedi", themselves:"kendileri", panicking:"panik yapma",
+  wellknown:"tanınmış / ünlü", oclock:"(tam saat)"
+};
+
+const track = document.getElementById('track');
+const playBtn = document.getElementById('playBtn');
+const tip = document.getElementById('tip');
+const vp = document.getElementById('viewport');
+let seqH = 0, linesOneSeq = 0, pxPerSec = 0, scrollPos = 0;   // scroll-tabanlı akış durumu
+let hovering = false, holdUntil = 0;
+function recomputeSpeed(){ pxPerSec = (seqH > 0 && linesOneSeq > 0) ? seqH / (linesOneSeq * secPerLine) : 0; }
+let paused = false;
+let secPerLine = 2.0;   // satır başına saniye (hız — küçük = hızlı)
+let lv = "all";
+// Kullanıcının eklediği hikâyeler — native taraftan (UserDefaults) enjekte edilir, oraya kaydedilir
+let custom = [];
+try {
+  if(Array.isArray(window.__SAVED_CUSTOM__)) custom = window.__SAVED_CUSTOM__;
+  else custom = JSON.parse(localStorage.getItem('customStories') || '[]') || [];
+} catch(e){ custom = []; }
+let customPick = null;    // seçili tek özel hikâye (null = hepsi karışık)
+let editingIndex = -1;    // editörde düzenlenen hikâye (-1 = yeni)
+function persistCustom(){
+  const json = JSON.stringify(custom);
+  try { localStorage.setItem('customStories', json); } catch(e){}
+  try { window.webkit.messageHandlers.store.postMessage(json); } catch(e){}   // native kalıcılık
+}
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function lookup(tok){
+  let k = tok.toLowerCase().replace(/[^a-z']/g,'');
+  k = k.replace(/'.*$/,'');            // dog's -> dog, o'clock -> o
+  if(!k) return null;
+  if(GLOSS[k]) return GLOSS[k];
+  const cands = [
+    k.replace(/ies$/,'y'), k.replace(/ves$/,'f'), k.replace(/es$/,''), k.replace(/s$/,''),
+    k.replace(/ied$/,'y'), k.replace(/ed$/,''), k.replace(/ed$/,'e'),
+    k.replace(/ing$/,''), k.replace(/ing$/,'e'),
+  ];
+  for(const c of cands){ if(c && c !== k && GLOSS[c]) return GLOSS[c]; }
+  return null;
+}
+
+function wrapWords(s){
+  return s.split(/(\s+)/).map(tok => {
+    if(!tok || /^\s+$/.test(tok)) return esc(tok);
+    const m = lookup(tok);
+    return m ? '<span class="w" data-m="' + esc(m) + '">' + esc(tok) + '</span>' : esc(tok);
+  }).join('');
+}
+
+/* ---------- Seslendirme motoru ----------
+   Ses native tarafta AVSpeechSynthesizer ile üretilir (hız + ton kontrolü orada güvenilir).
+   Native köprü yoksa (tarayıcı önizlemesi) web speechSynthesis'e düşer. */
+const NATIVE_TTS = !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.tts);
+let NATIVE_VOICES = Array.isArray(window.__VOICES__) ? window.__VOICES__ : [];
+// Native taraf yeni indirilen sesleri buradan bildirir (uygulamayı yeniden başlatmaya gerek yok)
+window.__setVoices = function(list){
+  if(!Array.isArray(list)) return;
+  NATIVE_VOICES = list;
+  fillVoiceSelects(); syncVoiceUI();
+};
+// Tarayıcıda cinsiyet bilgisi gelmez, isimden tahmin edilir (native tarafta sistem söyler)
+const FEM_NAMES = ['yelda','elif','seda','samantha','karen','moira','tessa','victoria','allison',
+                   'ava','susan','zoe','kathy','fiona','serena','anna','marie','amelie','alice'];
+const MAL_NAMES = ['cem','kaan','burak','daniel','fred','rishi','alex','tom','aaron','oliver',
+                   'albert','arthur','gordon','markus','yuri','luca'];
+function guessGender(n){
+  n = (n || '').toLowerCase();
+  if(FEM_NAMES.some(x => n.indexOf(x) >= 0)) return 'female';
+  if(MAL_NAMES.some(x => n.indexOf(x) >= 0)) return 'male';
+  return '';
+}
+function allVoices(){
+  if(NATIVE_VOICES.length) return NATIVE_VOICES;
+  try {
+    return (speechSynthesis.getVoices() || [])
+      .filter(v => /^(tr|en)/i.test(v.lang || ''))
+      .map(v => ({ id:v.voiceURI, name:v.name, lang:v.lang, gender:guessGender(v.name) }));
+  } catch(e){ return []; }
+}
+// lang:'auto' → metne bakıp karar ver; yoksa kullanıcının seçtiği dil (ör. 'de-DE')
+// voiceByLang → dil başına seçilen ses: { tr:'…Yelda', en:'…Daniel' }
+const V = { on:false, mode:'tr', gender:'female', rate:1.0, trim:1.0,
+            lang:'auto', voiceByLang:{}, trVoice:'', enVoice:'' };
+(function(){
+  let saved = null;
+  try {
+    saved = (window.__VSET__ && typeof window.__VSET__ === 'object')
+          ? window.__VSET__ : JSON.parse(localStorage.getItem('voiceSettings') || 'null');
+  } catch(e){}
+  if(saved) for(const k in V){ if(k !== 'on' && saved[k] !== undefined && saved[k] !== null) V[k] = saved[k]; }
+  if(!V.voiceByLang || typeof V.voiceByLang !== 'object') V.voiceByLang = {};
+  if(V.trVoice && !V.voiceByLang.tr) V.voiceByLang.tr = V.trVoice;      // eski ayarları taşı
+  if(V.enVoice && !V.voiceByLang.en) V.voiceByLang.en = V.enVoice;
+})();
+function persistVoice(){
+  const j = JSON.stringify(V);
+  try { localStorage.setItem('voiceSettings', j); } catch(e){}
+  try { window.webkit.messageHandlers.vset.postMessage(j); } catch(e){}   // native kalıcılık
+}
+function voicesOf(lang){ return allVoices().filter(v => (v.lang || '').toLowerCase().indexOf(lang) === 0); }
+// 'tr' → 'tr-TR', 'de-DE' → 'de-DE'
+function tamKod(lang){
+  const s = String(lang || 'tr');
+  if(s.indexOf('-') > 0) return s;
+  return s === 'tr' ? 'tr-TR' : (s === 'en' ? 'en-US' : s);
+}
+function pickVoice(code){
+  const iki = String(code || 'tr').slice(0, 2).toLowerCase();
+  const hepsi = voicesOf(iki);
+  if(!hepsi.length) return null;
+  const tam = hepsi.filter(v => (v.lang || '').toLowerCase() === String(code).toLowerCase());
+  const havuz = tam.concat(hepsi.filter(v => tam.indexOf(v) < 0));   // tam eşleşen lehçe önce
+  const secili = (V.voiceByLang || {})[iki];
+  if(secili){ const hit = havuz.filter(v => v.id === secili)[0]; if(hit) return hit; }
+  return havuz.filter(v => v.gender === V.gender)[0] || havuz[0];
+}
+// Okuma dili: kullanıcı bir dil seçtiyse o, "Otomatik"te metinden anla
+function resolveLang(text, want){
+  if(V.lang && V.lang !== 'auto') return V.lang;
+  if(want === 'en' && looksTurkish(text)) return 'tr';
+  return want;
+}
+// İstenen cinsiyette ses yoksa (macOS'ta Türkçe erkek ses yok) tonu kaydırıp tınıyı yaklaştır
+function pitchFor(v){
+  const base = (v && v.gender === V.gender) ? 1.0 : (V.gender === 'male' ? 0.66 : 1.20);
+  return Math.max(0.5, Math.min(2.0, base * V.trim));
+}
+// AVSpeechUtterance.rate doğrusal değil (ölçüldü: 0.50=normal, 0.55~1.3x, 0.60~1.6x, 0.70~2.1x)
+function nativeRate(m){
+  return m <= 1 ? Math.max(0.25, 0.5 - (1 - m) * 0.85) : Math.min(1.0, 0.5 + (m - 1) * 0.18);
+}
+
+let speakId = 0, speakDone = null, speakTimer = null;
+// Sadece JS tarafını sıfırla (bekleyen geri çağrı/zamanlayıcı geçersiz olsun)
+function resetSpeak(){
+  speakId++; speakDone = null;
+  if(speakTimer){ clearTimeout(speakTimer); speakTimer = null; }
+}
+// Gerçekten sustur (native tarafta gereksiz durdurma çağrısı yapmamak için ayrı tutuldu)
+function stopSpeak(){
+  resetSpeak();
+  if(NATIVE_TTS){ try { window.webkit.messageHandlers.ttsStop.postMessage(''); } catch(e){} }
+  else { try { speechSynthesis.cancel(); } catch(e){} }
+}
+function speakOne(text, lang, onEnd){
+  resetSpeak();      // native tarafta yeni konuşma zaten öncekini keser
+  const id = ++speakId;
+  const t = (text || '').trim();
+  const finish = () => {
+    if(id !== speakId) return;
+    speakDone = null;
+    if(speakTimer){ clearTimeout(speakTimer); speakTimer = null; }
+    if(onEnd) onEnd();
+  };
+  if(!t){ speakTimer = setTimeout(finish, 150); return; }        // boş çeviri satırında takılma
+  speakDone = finish;
+  const kod = tamKod(lang);
+  const v = pickVoice(kod);
+  const est = 900 + t.length * 80 / Math.max(0.5, V.rate);
+  speakTimer = setTimeout(finish, est * 2 + 1500);               // ses hiç gelmezse akış kilitlenmesin
+  if(NATIVE_TTS){
+    try {
+      window.webkit.messageHandlers.tts.postMessage({
+        text:t, id:id, voice:(v ? v.id : ''), lang:kod,
+        rate:nativeRate(V.rate), pitch:pitchFor(v)
+      });
+    } catch(e){ finish(); }
+  } else {
+    try {
+      const u = new SpeechSynthesisUtterance(t);
+      u.lang = kod;
+      u.rate = Math.max(0.5, Math.min(2, V.rate));
+      u.pitch = pitchFor(v);
+      if(v){
+        const wv = (speechSynthesis.getVoices() || []).filter(x => x.voiceURI === v.id || x.name === v.name)[0];
+        if(wv) u.voice = wv;
+      }
+      u.onend = finish; u.onerror = finish;
+      speechSynthesis.speak(u);
+    } catch(e){ finish(); }
+  }
+}
+window.__ttsEnd = function(id){ if(id === speakId && speakDone) speakDone(); };   // native geri çağrısı
+
+// Metnin dili: Türkçeye özgü harfler ya da sık Türkçe kelimeler → Türkçe say.
+// (Kullanıcı kendi Türkçe metnini "İngilizce" alanına yazabiliyor; o zaman da doğru sesle okunsun.)
+const TR_WORDS = ['bir','ve','için','ama','çok','ben','sen','bu','şu','gibi','daha','kadar','sonra',
+                  'değil','var','yok','ile','çünkü','her','şey','ne','mi','de','da','beni','bana',
+                  'onu','onun','biz','siz','olarak','oldu','dedi','diye','ki','ise','hem','ya'];
+function looksTurkish(t){
+  if(/[çğıöşüÇĞİÖŞÜ]/.test(t)) return true;
+  const w = t.toLowerCase().split(/[^a-zçğıöşü]+/).filter(Boolean);
+  let n = 0;
+  for(const x of w){ if(TR_WORDS.indexOf(x) >= 0) n++; }
+  return n >= 2;
+}
+// Satırın okunacak parçaları: seçilen dilde metin yoksa diğer alana düş, dili metinden sez
+function partsFor(el){
+  const en = (el.dataset.en || '').trim(), tr = (el.dataset.tr || '').trim();
+  const part = (txt, want) => [txt, resolveLang(txt, want)];
+  if(V.mode === 'tr') return tr ? [part(tr, 'tr')] : (en ? [part(en, 'en')] : []);
+  if(V.mode === 'en') return en ? [part(en, 'en')] : (tr ? [part(tr, 'tr')] : []);
+  const out = [];
+  if(en) out.push(part(en, 'en'));
+  if(tr && tr !== en) out.push(part(tr, 'tr'));
+  return out;
+}
+// Satırı ayarlara göre oku (tıklamada kullanılır)
+function speakLineParts(el, after){
+  const parts = partsFor(el);
+  let i = 0;
+  const step = () => {
+    if(i >= parts.length){ if(after) after(); return; }
+    const p = parts[i++];
+    speakOne(p[0], p[1], step);
+  };
+  step();
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function storyHTML(s){
+  const badge = s.lv === 'custom' ? 'BENİM' : s.lv.toUpperCase();
+  let h = '<div class="head ' + s.lv + '">'
+        + '<div class="lv">' + badge + '</div>'
+        + '<div class="en">' + esc(s.title) + '</div>'
+        + '<div class="tr">' + esc(s.ttr) + '</div></div>';
+  for (const ln of s.lines){
+    h += '<div class="line" data-en="' + esc(ln[0]) + '" data-tr="' + esc(ln[1] || '') + '">'
+       + '<div class="en">' + wrapWords(ln[0]) + '</div>'
+       + '<div class="tr">' + esc(ln[1]) + '</div></div>';
+  }
+  h += '<div class="dot">&bull; &bull; &bull;</div>';
+  return h;
+}
+
+function customList(){
+  return custom.map(c => ({ lv:'custom', title:c.title, ttr:c.ttr, lines:c.lines }));
+}
+
+function poolFor(l){
+  if(l === 'custom'){
+    const cl = customList();
+    if(customPick !== null && cl[customPick]) return [cl[customPick]];   // tek seçili hikâye
+    return cl;                                                            // hepsi karışık
+  }
+  if(l === 'all') return STORIES.concat(customList());
+  return STORIES.filter(s => s.lv === l);
+}
+
+function build(){
+  const list = poolFor(lv);
+  if(!list.length){
+    seqH = 0; linesOneSeq = 0; pxPerSec = 0;
+    track.innerHTML =
+      '<div class="empty">'
+      + '<div class="big">&#9997;&#65039;</div>'
+      + '<div class="t1">Henüz kendi hikâyen yok</div>'
+      + '<div class="t2">İngilizce metnini ve Türkçe çevirisini ekle,<br>otomatik olarak altında çevirisiyle aksın.</div>'
+      + '<button class="btn" id="emptyAdd" style="height:30px">&#9998; Hikâye Ekle</button>'
+      + '</div>';
+    const ea = document.getElementById('emptyAdd');
+    if(ea) ea.onclick = openEditor;
+    if(narrating) setNarration(false);            // okunacak satır kalmadı
+    return;
+  }
+  const order = shuffle(list);              // her seferinde farklı sıra
+  const seq = order.map(storyHTML).join('');
+  track.innerHTML = seq + seq;              // kesintisiz döngü için iki kez
+  linesOneSeq = order.reduce((t, s) => t + s.lines.length + 2, 0);
+  vp.scrollTop = 0; scrollPos = 0;
+  measure();                                // senkron ölç (rAF beklemeden)
+  if(narrating){ stopSpeak(); narrIdx = 0; readLine(); }   // yeni sıra baştan okunsun
+}
+
+function measure(){
+  seqH = track.scrollHeight / 2;            // bir dizinin yüksekliği = toplam/2
+  recomputeSpeed();
+}
+
+/* ---------- Seslendirmeli akış: kaydırmayı ses sürükler ---------- */
+let narrating = false, narrIdx = 0, narrTarget = 0, narrQueue = [];
+function lineEls(){ return track.querySelectorAll('.line'); }
+function centerFor(el){ return el.offsetTop - (vp.clientHeight - el.offsetHeight) / 2; }
+function nearestLineIdx(){
+  const els = lineEls(); if(!els.length) return 0;
+  const mid = vp.scrollTop + vp.clientHeight / 2;
+  let best = 0, bd = Infinity;
+  for(let i = 0; i < els.length; i++){
+    const d = Math.abs(els[i].offsetTop + els[i].offsetHeight / 2 - mid);
+    if(d < bd){ bd = d; best = i; }
+  }
+  return best;
+}
+// Konumu ve okunan satırı ilk kopyaya indirger — iki kopya özdeş olduğu için görünmez.
+// Böylece scrollPos hep [0, seqH) aralığında kalır ve akış geriye sıçramaz.
+function normalizeNarr(){
+  const half = lineEls().length >> 1;
+  if(seqH <= 0 || half <= 0) return;
+  let moved = false;
+  while(narrIdx >= half && scrollPos >= seqH){ narrIdx -= half; scrollPos -= seqH; moved = true; }
+  if(moved) vp.scrollTop = scrollPos;
+}
+function setNarration(on, from){
+  if(on){
+    if(!lineEls().length) return;
+    narrating = true; V.on = true;
+    paused = false; playBtn.textContent = '⏸';
+    holdUntil = 0;
+    scrollPos = vp.scrollTop;
+    narrIdx = (typeof from === 'number') ? from : nearestLineIdx();
+    normalizeNarr();
+    readLine();
+  } else {
+    narrating = false; V.on = false;
+    stopSpeak(); narrQueue = [];
+    const r = document.querySelector('.line.reading'); if(r) r.classList.remove('reading');
+    scrollPos = vp.scrollTop;
+  }
+  syncVoiceUI();
+}
+function readLine(){
+  const els = lineEls();
+  if(!narrating || !els.length) return;
+  if(narrIdx < 0 || narrIdx >= els.length) narrIdx = 0;
+  const el = els[narrIdx];
+  const old = document.querySelector('.line.reading'); if(old) old.classList.remove('reading');
+  el.classList.add('reading');
+  const maxScroll = Math.max(0, track.scrollHeight - vp.clientHeight);
+  narrTarget = Math.max(0, Math.min(centerFor(el), maxScroll));   // kaydırılamayan uçlarda hedef takılmasın
+  narrQueue = partsFor(el);
+  if(!narrQueue.length){ dwellThenAdvance(el); return; }   // okunacak metin yok → uçup gitmesin
+  nextChunk();
+}
+// Metni olmayan satırda bile okunabilir bir süre bekle (akış fırlamasın)
+function dwellThenAdvance(el){
+  stopSpeak();
+  const id = ++speakId;
+  const n = ((el.dataset.en || '') + (el.dataset.tr || '')).length;
+  speakTimer = setTimeout(() => {
+    if(id !== speakId) return;
+    speakTimer = null; advanceLine();
+  }, Math.max(700, Math.min(3200, n * 45)));
+}
+function nextChunk(){
+  if(!narrating || paused) return;
+  if(!narrQueue.length){ advanceLine(); return; }
+  const part = narrQueue.shift();
+  speakOne(part[0], part[1], nextChunk);
+}
+function advanceLine(){
+  const els = lineEls();
+  if(!narrating || !els.length) return;
+  const half = els.length >> 1;
+  narrIdx++;
+  if(narrIdx >= els.length) narrIdx = half || 0;
+  normalizeNarr();          // ikinci kopyaya geçtiysek görünmeden başa sar
+  readLine();
+}
+
+// Cümleye tıkla → seslendir (seslendirme açıkken: okumayı oraya taşı)
+track.addEventListener('click', e => {
+  const line = e.target.closest('.line');
+  if (!line) return;
+  if(narrating){
+    const els = lineEls();
+    for(let i = 0; i < els.length; i++){
+      if(els[i] === line){ narrIdx = i; holdUntil = 0; stopSpeak(); readLine(); break; }
+    }
+    return;
+  }
+  document.querySelectorAll('.line.spoken').forEach(c => c.classList.remove('spoken'));
+  line.classList.add('spoken');
+  speakLineParts(line);
+});
+
+// Kelimeye gel → anlamı baloncukta (kaydırma zaten durur, konum sabit)
+track.addEventListener('mouseover', e => {
+  const w = e.target.closest('.w');
+  if (!w) return;
+  tip.textContent = w.dataset.m;
+  const r = w.getBoundingClientRect();
+  let top = r.top - 8;
+  tip.style.left = (r.left + r.width / 2) + 'px';
+  tip.style.top = top + 'px';
+  tip.style.opacity = '1';
+  if(TOUCH) setTimeout(() => { tip.style.opacity = '0'; }, 2600);   // dokunmatikte kendiliğinden kaybolsun
+});
+track.addEventListener('mouseout', e => {
+  if (e.target.closest('.w')) tip.style.opacity = '0';
+});
+
+// Dokunmatik ekranda (iPad) "fare üstünde" diye bir şey yok — akış kalıcı durmasın
+const TOUCH = !!(window.matchMedia && window.matchMedia('(hover: none)').matches);
+
+// Fare panelin üstündeyken otomatik akışı durdur (rahat okuma + kelime anlamı)
+if(!TOUCH){
+  vp.addEventListener('mouseenter', () => { hovering = true; });
+  vp.addEventListener('mouseleave', () => { hovering = false; tip.style.opacity = '0'; });
+}
+
+// Elle kaydırınca akışı kısa süre beklet → kaçan kısma geri dönebil
+vp.addEventListener('wheel', () => { holdUntil = performance.now() + 2500; }, { passive: true });
+vp.addEventListener('touchstart', () => { holdUntil = performance.now() + 2500; }, { passive: true });
+vp.addEventListener('touchmove',  () => { holdUntil = performance.now() + 2500; }, { passive: true });
+
+// Kesintisiz döngü sarması (strict koşullar → salınım yok; iki kopya özdeş olduğu için görünmez)
+function wrap(){
+  if(seqH <= 0 || narrating) return;   // seslendirmede sarmayı advanceLine yönetir
+  if(vp.scrollTop > seqH) vp.scrollTop -= seqH;         // aşağıda bir dizi geçince başa sar
+  else if(vp.scrollTop <= 0) vp.scrollTop = seqH;       // en tepeye gelince sona sar (geri kaydırma sürsün)
+}
+vp.addEventListener('scroll', wrap);
+
+// Akış motoru: konumu ondalıklı biriktir (alt-piksel kaybını önler), her kare scrollTop'a yaz
+let lastT = performance.now();
+function frame(now){
+  const dt = Math.min((now - lastT) / 1000, 0.05); lastT = now;   // arka plandan dönüşte sıçrama olmasın
+  if(seqH <= 0 && track.scrollHeight > 0) measure();              // ölçüm kaçtıysa kendini onar
+  if(narrating){                                                  // ses modunda: okunan satırı ortaya süzül
+    if(!paused && now > holdUntil && seqH > 0){
+      const d = narrTarget - scrollPos;
+      scrollPos = Math.abs(d) < 0.7 ? narrTarget : scrollPos + d * Math.min(1, dt * 4);
+      vp.scrollTop = scrollPos;
+    } else {
+      scrollPos = vp.scrollTop;                                   // duraklatınca/elle kaydırınca takip et
+    }
+    requestAnimationFrame(frame); return;
+  }
+  const active = !paused && !hovering && now > holdUntil && seqH > 0 && pxPerSec > 0;
+  if(active){
+    scrollPos += pxPerSec * dt;
+    if(scrollPos > seqH) scrollPos -= seqH;                       // kesintisiz döngü
+    else if(scrollPos < 0) scrollPos += seqH;
+    vp.scrollTop = scrollPos;
+  } else {
+    scrollPos = vp.scrollTop;                                     // durunca/elle kaydırınca konumu takip et
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+// pencere yeniden boyutlanınca yükseklik değişir → yeniden ölç
+window.addEventListener('resize', () => { if(seqH > 0 || track.scrollHeight > 0) measure(); });
+
+const hintEl = document.getElementById('hint');
+const HINT_DEFAULT = hintEl ? hintEl.textContent : '';
+let hintTimer = null;
+function flash(msg){
+  if(!hintEl) return;
+  hintEl.textContent = msg;
+  if(hintTimer) clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => { hintEl.textContent = HINT_DEFAULT; }, 1800);
+}
+
+playBtn.onclick = () => {
+  paused = !paused;
+  playBtn.textContent = paused ? '▶' : '⏸';
+  if(narrating){ if(paused) stopSpeak(); else readLine(); }
+};
+// Seslendirme açıkken −/+ ses hızını, kapalıyken akış hızını değiştirir
+document.getElementById('slower').onclick = () => {
+  if(narrating){ setRate(V.rate - 0.1); flash('Ses hızı ' + rateLabel()); }
+  else { secPerLine = Math.min(secPerLine + 0.4, 5); recomputeSpeed(); }
+};
+document.getElementById('faster').onclick = () => {
+  if(narrating){ setRate(V.rate + 0.1); flash('Ses hızı ' + rateLabel()); }
+  else { secPerLine = Math.max(secPerLine - 0.4, 0.8); recomputeSpeed(); }
+};
+document.getElementById('shuffleBtn').onclick = () => build();
+
+function setActiveChip(l){
+  document.querySelectorAll('#bar .chip').forEach(c => c.classList.toggle('on', c.dataset.lv === l));
+}
+document.querySelectorAll('#bar .chip').forEach(chip => {
+  chip.onclick = () => {
+    if(chip.dataset.lv === 'custom'){ openLibrary(); return; }   // "Benim" → kitaplığı aç
+    setActiveChip(chip.dataset.lv); lv = chip.dataset.lv; build();
+  };
+});
+
+const editor   = document.getElementById('editor');
+const library  = document.getElementById('library');
+const cTitle   = document.getElementById('cTitle');
+const cEn      = document.getElementById('cEn');
+const cTr      = document.getElementById('cTr');
+const statusEl = document.getElementById('status');
+
+function getLines(t){ return t.split(/\r?\n/).map(s => s.trim()).filter(Boolean); }
+function setStatus(m){ statusEl.textContent = m || ''; }
+
+// ---- Kitaplığım: özel hikâyeleri listele, birine basınca o hikâye açılır ----
+function openLibrary(){ renderLibrary(); library.style.display = 'flex'; }
+function closeLibrary(){ library.style.display = 'none'; }
+
+function renderLibrary(){
+  const box = document.getElementById('libList');
+  if(!custom.length){
+    box.innerHTML = '<div class="libempty">Henüz kendi hikâyen yok.<br>Yukarıdan “Yeni Hikâye” ile ekle.</div>';
+    return;
+  }
+  box.innerHTML = custom.map((c, i) =>
+      '<div class="story-card" data-i="' + i + '">'
+    + '<div class="st">' + esc(c.title) + '</div>'
+    + '<div class="sc">' + c.lines.length + ' cümle · ' + esc((c.lines[0] && c.lines[0][0]) || '') + '</div>'
+    + '<div class="acts">'
+    + '<button class="mini play" data-i="' + i + '">&#9654; Aç</button>'
+    + '<button class="mini edit" data-i="' + i + '">&#9998; Düzenle</button>'
+    + '<button class="mini del" data-i="' + i + '">&#128465; Sil</button>'
+    + '</div></div>'
+  ).join('');
+  box.querySelectorAll('.story-card').forEach(card => {
+    card.onclick = (e) => { if(e.target.closest('.mini')) return; playCustom(parseInt(card.dataset.i, 10)); };
+  });
+  box.querySelectorAll('.mini.play').forEach(b => b.onclick = () => playCustom(parseInt(b.dataset.i, 10)));
+  box.querySelectorAll('.mini.edit').forEach(b => b.onclick = () => editCustom(parseInt(b.dataset.i, 10)));
+  // Silme iki adımlı: tek tıkla hikâye uçmasın
+  box.querySelectorAll('.mini.del').forEach(b => b.onclick = () => {
+    if(b.dataset.sure !== '1'){
+      b.dataset.sure = '1';
+      b.textContent = 'Emin misin?';
+      b.style.color = '#ff8a8a'; b.style.borderColor = '#ff8a8a';
+      setTimeout(() => {
+        if(b.dataset.sure === '1'){ b.dataset.sure = '0'; b.textContent = '🗑 Sil'; b.style.color = ''; b.style.borderColor = ''; }
+      }, 4000);
+      return;
+    }
+    const i = parseInt(b.dataset.i, 10);
+    const ad = (custom[i] || {}).title || 'Hikâye';
+    custom.splice(i, 1);
+    persistCustom(); renderLibrary();
+    customPick = null;
+    if(lv === 'custom' || lv === 'all') build();
+    toast('“' + ad + '” silindi — “↩ Yedekler” ile geri alabilirsin.', 5000);
+  });
+}
+
+function playCustom(i){ customPick = i; lv = 'custom'; setActiveChip('custom'); closeLibrary(); build(); }
+
+function editCustom(i){
+  editingIndex = i;
+  cTitle.value = custom[i].title;
+  cEn.value = custom[i].lines.map(l => l[0]).join('\n');
+  cTr.value = custom[i].lines.map(l => l[1]).join('\n');
+  setStatus('');
+  closeLibrary();
+  editor.style.display = 'flex'; cEn.focus();
+}
+
+document.getElementById('libClose').onclick = closeLibrary;
+document.getElementById('libAll').onclick = () => { customPick = null; lv = 'custom'; setActiveChip('custom'); closeLibrary(); build(); };
+document.getElementById('libNew').onclick = () => { closeLibrary(); openEditor(); };
+
+/* ---------- PDF → akan yazı ---------- */
+let toastTimer = null;
+function toast(msg, ms){
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.style.opacity = '1';
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.opacity = '0'; }, ms || 3800);
+}
+window.__dropHint = function(show){
+  const d = document.getElementById('droplay');
+  if(d) d.style.display = show ? 'flex' : 'none';
+};
+window.__pdfError = function(m){ toast(m, 6000); };
+
+// Cümlelere böl — "Dr.", "vb.", "08.30", "A. Yılmaz" gibi yerlerde BÖLMEZ
+const ABBR = ['dr','sn','prof','doç','av','mah','cad','sok','no','vb','vs','örn','bkz','sf','s',
+              'çev','ed','yy','tl','md','müh','op','uzm','öğr','gör','bkz','age','bkz','şb','apt'];
+function cumlelereBol(s){
+  const res = [];
+  let start = 0;
+  for(let i = 0; i < s.length; i++){
+    const c = s[i];
+    if(c !== '.' && c !== '!' && c !== '?' && c !== '…') continue;
+    let j = i + 1;
+    while(j < s.length && /["'”’)\]]/.test(s[j])) j++;
+    if(j < s.length && !/\s/.test(s[j])) continue;          // www.site.com, 3.5 → bölme
+    if(c === '.'){
+      const oncekiKelime = ((s.slice(0, i).match(/[\p{L}]+$/u)) || [''])[0].toLowerCase();
+      if(ABBR.indexOf(oncekiKelime) >= 0) continue;          // Dr. vb. örn.
+      if(oncekiKelime.length === 1 && /[A-ZÇĞİÖŞÜ]/.test(s[i - 1] || '')) continue;   // A. Yılmaz
+      if(/\d/.test(s[i - 1] || '') && /^\s*\d/.test(s.slice(i + 1))) continue;        // 08.30
+      const sonra = s.slice(j).replace(/^\s+/, '');
+      if(sonra && /^[a-zçğıöşü]/.test(sonra[0])) continue;   // küçük harfle sürüyorsa cümle bitmemiş
+    }
+    const parca = s.slice(start, j).trim();
+    if(parca) res.push(parca);
+    start = j;
+  }
+  const kalan = s.slice(start).trim();
+  if(kalan) res.push(kalan);
+  return res;
+}
+
+// PDF metnini cümlelere böl: satır sonu tirelemesini birleştir, paragraf satırlarını
+// toparla, sayfa numaralarını at, çok uzun cümleleri virgülden yumuşak böl
+function splitSentences(text){
+  const t = String(text || '')
+    .replace(/\r/g, '')
+    .replace(/\u00ad/g, '')
+    .replace(/([a-zçğıöşü])-\n([a-zçğıöşü])/g, '$1$2');
+  const out = [];
+  for(const para of t.split(/\n\s*\n/)){
+    const satirlar = para.split('\n').map(x => x.trim())
+      .filter(x => x && !/^[0-9ivxlcIVXLC.\-—•|\s]+$/.test(x));      // sayfa no / süs satırı
+    if(!satirlar.length) continue;
+    // Başlık gibi duran ilk satırı ayrı tut (kısa ve noktalamayla bitmiyor)
+    if(satirlar.length > 1 && satirlar[0].length < 60 && !/[.!?…:;,]$/.test(satirlar[0])){
+      out.push(satirlar.shift());
+    }
+    const s = satirlar.join(' ').replace(/\s+/g, ' ').trim();
+    if(!s) continue;
+    for(const c of cumlelereBol(s)) out.push(c);
+  }
+  const son = [];
+  for(const s of out){
+    let rest = s;
+    while(rest.length > 320){
+      let cut = rest.lastIndexOf(', ', 320);
+      if(cut < 120) cut = rest.lastIndexOf(' ', 320);
+      if(cut < 60) cut = 320;
+      son.push(rest.slice(0, cut + 1).trim());
+      rest = rest.slice(cut + 1).trim();
+    }
+    if(rest) son.push(rest);
+  }
+  return son;
+}
+
+window.__pdfImported = function(title, text, sayfa){
+  const cumleler = splitSentences(text);
+  if(!cumleler.length){ toast('PDF okundu ama cümle çıkarılamadı.', 5000); return; }
+  const LIMIT = 4000;
+  const kesildi = cumleler.length > LIMIT;
+  const lines = cumleler.slice(0, LIMIT).map(c => [c, '']);
+  custom.push({
+    title: (title || 'PDF').slice(0, 60),
+    ttr: (sayfa ? "PDF'ten alındı · " + sayfa + ' sayfa · ' : 'Dosyadan alındı · ') + lines.length + ' cümle',
+    lines: lines
+  });
+  persistCustom();
+  playCustom(custom.length - 1);
+  toast('“' + (title || 'PDF') + '” eklendi: ' + lines.length + ' cümle'
+        + (kesildi ? ' (ilk ' + LIMIT + ')' : '') + '. Sesli okumak için 🔊', 5500);
+};
+
+/* ---------- Yedekler: her değişiklikten önceki hâl diske kopyalanır ---------- */
+document.getElementById('libBackup').onclick = () => {
+  try { window.webkit.messageHandlers.listBackups.postMessage(''); }
+  catch(e){ toast('Yedekler yalnızca uygulamanın içinde görünür.', 3500); }
+};
+window.__backups = function(list){
+  const box = document.getElementById('libList');
+  if(!Array.isArray(list) || !list.length){
+    box.innerHTML = '<div class="libempty">Henüz yedek yok.<br>Hikâye eklediğinde/sildiğinde önceki hâli buraya kopyalanır.</div>'
+                  + '<div class="librow"><button class="btn" id="libBack">&#8592; Kitaplığa dön</button></div>';
+  } else {
+    box.innerHTML = '<div class="sub">Her satır, o tarihteki hikâye listesinin tamamıdır. Geri yükleyince mevcut liste onunla değişir (o hâl de yedeklenir).</div>'
+      + list.map(b =>
+          '<div class="story-card">'
+        + '<div class="st">' + esc(b.tarih) + '</div>'
+        + '<div class="sc">' + b.sayi + ' hikâye · ' + esc((b.basliklar || []).join(', ')) + '</div>'
+        + '<div class="acts"><button class="mini geri" data-f="' + esc(b.file) + '">&#8617; Geri Yükle</button></div>'
+        + '</div>').join('')
+      + '<div class="librow"><button class="btn" id="libBack">&#8592; Kitaplığa dön</button></div>';
+    box.querySelectorAll('.mini.geri').forEach(b => b.onclick = () => {
+      try { window.webkit.messageHandlers.restoreBackup.postMessage(b.dataset.f); } catch(e){}
+    });
+  }
+  const geri = document.getElementById('libBack');
+  if(geri) geri.onclick = renderLibrary;
+};
+window.__restoreBackup = function(json){
+  let list;
+  try { list = JSON.parse(json); } catch(e){ toast('Yedek bozuk görünüyor.', 4000); return; }
+  if(!Array.isArray(list)){ toast('Yedek bozuk görünüyor.', 4000); return; }
+  custom = list;
+  customPick = null;
+  persistCustom();          // mevcut hâl de yedeklenir
+  renderLibrary();
+  if(lv === 'custom' || lv === 'all') build();
+  toast(list.length + ' hikâye geri yüklendi.', 4000);
+};
+
+document.getElementById('libPdf').onclick = () => {
+  try { window.webkit.messageHandlers.pickPdf.postMessage(''); closeLibrary(); }
+  catch(e){ toast('PDF seçme yalnızca uygulamanın içinde çalışır.', 3500); }
+};
+
+// ---- Editör: yeni ekle / var olanı düzenle ----
+function openEditor(){ editingIndex = -1; cTitle.value = ''; cEn.value = ''; cTr.value = ''; setStatus(''); editor.style.display = 'flex'; cEn.focus(); }
+function closeEditor(){ editor.style.display = 'none'; }
+
+document.getElementById('addBtn').onclick = openEditor;
+document.getElementById('cancelBtn').onclick = () => { closeEditor(); openLibrary(); };
+
+document.getElementById('saveBtn').onclick = () => {
+  const en = getLines(cEn.value);
+  const tr = getLines(cTr.value);
+  if(!en.length){ setStatus('En az bir İngilizce cümle gir.'); return; }
+  const story = {
+    title: (cTitle.value.trim() || 'Benim Hikâyem'),
+    ttr:   'Özel hikâye',
+    lines: en.map((e, i) => [e, tr[i] || ''])
+  };
+  let idx;
+  if(editingIndex >= 0 && custom[editingIndex]){ custom[editingIndex] = story; idx = editingIndex; }
+  else { custom.push(story); idx = custom.length - 1; }
+  persistCustom();
+  editingIndex = -1;
+  cTitle.value = ''; cEn.value = ''; cTr.value = '';
+  closeEditor();
+  playCustom(idx);   // kaydedince o hikâyeyi aç
+};
+
+// Otomatik çeviri (EN→TR) — Google'ın anahtarsız uç noktası (uzun metni destekler, kaliteli)
+async function gtxTranslate(text){
+  const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=tr&dt=t&q=' + encodeURIComponent(text);
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('http ' + r.status);
+  const j = await r.json();
+  return j[0].map(s => s[0]).join('');   // parçaları birleştir (satır sonları korunur)
+}
+
+// Satırları ~1500 karakterlik gruplara böl, az istekle çevir; hizalama bozulursa satır satır düzelt
+async function translateLines(enLines, onProgress){
+  const chunks = []; let cur = []; let len = 0;
+  for(const ln of enLines){
+    if(len + ln.length > 1500 && cur.length){ chunks.push(cur); cur = []; len = 0; }
+    cur.push(ln); len += ln.length + 1;
+  }
+  if(cur.length) chunks.push(cur);
+
+  const result = []; let done = 0;
+  for(const ch of chunks){
+    let trLines;
+    try {
+      trLines = (await gtxTranslate(ch.join('\n'))).split('\n');
+    } catch(e){ trLines = []; }
+    if(trLines.length !== ch.length){           // hizalama tutmadıysa güvenli mod: satır satır
+      trLines = [];
+      for(const line of ch){
+        try { trLines.push(await gtxTranslate(line)); } catch(e){ trLines.push(''); }
+      }
+    }
+    for(let i = 0; i < ch.length; i++) result.push((trLines[i] || '').trim());
+    done += ch.length;
+    if(onProgress) onProgress(done, enLines.length);
+  }
+  return result;
+}
+
+document.getElementById('autoBtn').onclick = async () => {
+  const en = getLines(cEn.value);
+  if(!en.length){ setStatus('Önce İngilizce cümleleri gir.'); return; }
+  const btn = document.getElementById('autoBtn');
+  btn.disabled = true;
+  setStatus('Çevriliyor… 0/' + en.length);
+  try {
+    const tr = await translateLines(en, (d, t) => setStatus('Çevriliyor… ' + d + '/' + t));
+    cTr.value = tr.join('\n');
+    setStatus('Çeviri hazır (' + en.length + ' cümle) — istersen düzelt, sonra kaydet.');
+  } catch(e) {
+    setStatus('Otomatik çeviri başarısız (internet gerekiyor). Türkçeyi elle yazabilirsin.');
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+/* ---------- Seslendirme paneli ---------- */
+const voicePanel = document.getElementById('voice');
+const narrBtn = document.getElementById('narrBtn');
+
+function rateLabel(){ return (Math.round(V.rate * 100) / 100) + '×'; }
+function setRate(r){
+  V.rate = Math.max(0.8, Math.min(2, Math.round(r * 100) / 100));
+  persistVoice(); syncVoiceUI();
+}
+function dilAdi(code){
+  try { return new Intl.DisplayNames(['tr'], { type: 'language' }).of(code) || code; }
+  catch(e){ return code; }
+}
+function fillLangSelect(){
+  const sel = document.getElementById('vLang'); if(!sel) return;
+  const kodlar = [];
+  allVoices().forEach(v => { if(v.lang && kodlar.indexOf(v.lang) < 0) kodlar.push(v.lang); });
+  sel.innerHTML = '<option value="auto">Otomatik (metne göre)</option>'
+    + kodlar.map(k => '<option value="' + esc(k) + '">' + esc(dilAdi(k)) + '</option>').join('');
+  sel.value = V.lang || 'auto';
+  if(sel.value !== (V.lang || 'auto')){ sel.value = 'auto'; V.lang = 'auto'; }   // dil artık yoksa
+}
+function fillVoiceSelects(){
+  fillLangSelect();
+  const sel = document.getElementById('vVoice'); if(!sel) return;
+  if(!V.lang || V.lang === 'auto'){
+    sel.innerHTML = '<option value="">Dile göre otomatik seçilir</option>';
+    sel.value = ''; sel.disabled = true;
+    return;
+  }
+  sel.disabled = false;
+  const iki = V.lang.slice(0, 2).toLowerCase();
+  const cur = (V.voiceByLang || {})[iki] || '';
+  sel.innerHTML = '<option value="">Otomatik (' + (V.gender === 'male' ? 'erkek' : 'kadın') + ')</option>'
+    + voicesOf(iki).map(v => {
+        const g = v.gender === 'male' ? ' · erkek' : (v.gender === 'female' ? ' · kadın' : '');
+        const q = v.quality === 'premium' ? ' · premium' : (v.quality === 'enhanced' ? ' · gelişmiş' : '');
+        return '<option value="' + esc(v.id) + '">' + esc(v.name) + ' (' + esc(v.lang) + ')' + g + q + '</option>';
+      }).join('');
+  sel.value = cur;
+  if(sel.value !== cur){ sel.value = ''; V.voiceByLang[iki] = ''; }   // kayıtlı ses artık yoksa
+}
+// Daha gerçekçi ses için ne indirilebilir? (macOS'un Türkçe ses paketleri)
+function voiceNote(){
+  const tr = voicesOf('tr');
+  const yol = (window.__PLATFORM__ === 'ios')
+    ? 'Ayarlar → Erişilebilirlik → Sözlü İçerik → Sesler → Türkçe'
+    : 'Sistem Ayarları → Erişilebilirlik → Sözlü İçerik → Sistem Sesi → Sesleri Yönet → Türkçe';
+  if(!tr.length) return 'Bu Mac üzerinde hiç Türkçe ses yok. ' + yol + ' yolundan bir Türkçe ses indir.';
+  const eksik = [];
+  if(!tr.some(v => v.quality === 'premium' || v.quality === 'enhanced'))
+    eksik.push('“Yelda (Premium)” (~490 MB) — şu ankinin çok daha doğal, insana yakın hali');
+  if(!tr.some(v => v.gender === 'male'))
+    eksik.push('“Cem” (~125 MB) — gerçek Türkçe erkek ses; indirilene kadar Erkek seçeneği Yelda’nın tonunu düşürerek taklit eder');
+  if(!eksik.length) return '';
+  return 'Şu an sadece temel kalite ses yüklü, o yüzden robotik duyuluyor. ' + yol + ' yolundan indirebileceklerin: ' + eksik.join(' · ') + '. İndirdikten sonra “Sesleri Yenile” de yeter, uygulamayı kapatmana gerek yok. (Siri sesleri elif/kaan daha da gerçekçi ama Apple onları uygulamalara açmıyor.)';
+}
+function syncVoiceUI(){
+  document.querySelectorAll('.vmode').forEach(c => c.classList.toggle('on', c.dataset.m === V.mode));
+  document.querySelectorAll('.vgen').forEach(c => c.classList.toggle('on', c.dataset.g === V.gender));
+  const r = document.getElementById('vRate'), rv = document.getElementById('vRateVal');
+  if(r) r.value = V.rate;
+  if(rv) rv.textContent = rateLabel();
+  const t = document.getElementById('vTrim'), tv = document.getElementById('vTrimVal');
+  if(t) t.value = V.trim;
+  if(tv) tv.textContent = (Math.round(V.trim * 100) / 100).toFixed(2);
+  const nt = document.getElementById('narrToggle');
+  if(nt) nt.textContent = narrating ? '⏹ Seslendirmeyi Durdur' : '▶ Seslendirmeyi Başlat';
+  if(narrBtn){
+    narrBtn.classList.toggle('on', narrating);
+    narrBtn.title = (narrating ? 'Sesli okumayı kapat' : 'Sesli okumayı aç') + ' (S)';
+  }
+  const note = document.getElementById('vNote'), getRow = document.getElementById('vGetRow');
+  const m = voiceNote();
+  if(note){ note.textContent = m; note.style.display = m ? 'block' : 'none'; }
+  if(getRow) getRow.style.display = m ? 'flex' : 'none';
+}
+function refreshVoices(){ try { window.webkit.messageHandlers.voicesRefresh.postMessage(''); } catch(e){} }
+
+document.getElementById('voiceBtn').onclick = () => {
+  refreshVoices();                       // arada yeni ses indirilmiş olabilir
+  fillVoiceSelects(); syncVoiceUI();
+  voicePanel.style.display = 'flex';
+};
+document.getElementById('vRefresh').onclick = () => { refreshVoices(); flash('Ses listesi yenilendi'); };
+document.getElementById('vGetVoices').onclick = () => {
+  try { window.webkit.messageHandlers.openVoiceSettings.postMessage(''); } catch(e){}
+};
+document.getElementById('voiceClose').onclick = () => { voicePanel.style.display = 'none'; };
+narrBtn.onclick = () => setNarration(!narrating);
+document.getElementById('narrToggle').onclick = () => setNarration(!narrating);
+
+document.querySelectorAll('.vmode').forEach(c => c.onclick = () => {
+  V.mode = c.dataset.m; persistVoice(); syncVoiceUI();
+  if(narrating){ stopSpeak(); readLine(); }
+});
+document.querySelectorAll('.vgen').forEach(c => c.onclick = () => {
+  V.gender = c.dataset.g; persistVoice(); fillVoiceSelects(); syncVoiceUI();
+  if(narrating){ stopSpeak(); readLine(); }
+});
+document.getElementById('vRate').oninput  = e => { V.rate = parseFloat(e.target.value); syncVoiceUI(); };
+document.getElementById('vRate').onchange = () => persistVoice();
+document.getElementById('vTrim').oninput  = e => { V.trim = parseFloat(e.target.value); syncVoiceUI(); };
+document.getElementById('vTrim').onchange = () => persistVoice();
+document.getElementById('vLang').onchange = e => {
+  V.lang = e.target.value || 'auto';
+  persistVoice(); fillVoiceSelects(); syncVoiceUI();
+  if(narrating){ stopSpeak(); readLine(); }
+};
+document.getElementById('vVoice').onchange = e => {
+  if(!V.lang || V.lang === 'auto') return;
+  V.voiceByLang = V.voiceByLang || {};
+  V.voiceByLang[V.lang.slice(0, 2).toLowerCase()] = e.target.value;
+  persistVoice();
+  if(narrating){ stopSpeak(); readLine(); }
+};
+document.getElementById('vTest').onclick = () => {
+  const kod = (V.lang && V.lang !== 'auto') ? V.lang : (V.mode === 'en' ? 'en' : 'tr');
+  const iki = tamKod(kod).slice(0, 2);
+  speakOne(iki === 'tr' ? 'Merhaba, hikâyeni işte böyle okuyacağım.'
+         : iki === 'en' ? 'Hello, this is how I will read your story.'
+         : 'Test: 1, 2, 3.', kod);
+};
+try { speechSynthesis.onvoiceschanged = () => { fillVoiceSelects(); syncVoiceUI(); }; } catch(e){}
+
+// S = seslendirmeyi aç/kapat, boşluk = duraklat, Esc = açık paneli kapat
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    [voicePanel, library, editor].forEach(p => { if(p) p.style.display = 'none'; });
+    return;
+  }
+  const t = (e.target && e.target.tagName) || '';
+  if(t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return;
+  if(e.key === 's' || e.key === 'S'){ setNarration(!narrating); e.preventDefault(); }
+  else if(e.key === ' '){ playBtn.onclick(); e.preventDefault(); }
+});
+
+build();
+fillVoiceSelects();
+syncVoiceUI();
+</script>
+<script>
+/* ---------- Web sürümü uyarlamaları ---------- */
+window.__PLATFORM__ = 'web';
+(function(){
+  // Yalnızca native uygulamada anlamı olan düğmeleri gizle
+  ['vGetRow', 'libBackup'].forEach(id => { const e = document.getElementById(id); if(e) e.style.display = 'none'; });
+
+  // Ses notu: tarayıcıda sesler işletim sisteminden gelir
+  window.voiceNote = function(){
+    const tr = voicesOf('tr');
+    if(!tr.length) return 'Tarayıcı Türkçe ses bulamadı. iPhone/iPad’de Ayarlar → Erişilebilirlik → '
+      + 'Sözlü İçerik → Sesler → Türkçe, Android’de Ayarlar → Erişilebilirlik → Metin okuma bölümünden ses ekleyebilirsin.';
+    if(!tr.some(v => v.gender === 'male'))
+      return 'Bu cihazda tek Türkçe ses var: ' + tr[0].name + '. “Erkek” seçilince ton düşürülerek taklit edilir '
+        + '(Safari tonu yok sayabilir). Cihaz ayarlarından ek Türkçe ses indirirsen burada da görünür.';
+    return '';
+  };
+
+  // PDF yerine düz metin dosyası yükleme (tarayıcıda PDF okuyucu yok)
+  const pdfBtn = document.getElementById('libPdf');
+  if(pdfBtn){
+    pdfBtn.textContent = '📄 Metin Dosyası';
+    pdfBtn.title = 'Bir .txt dosyası seç';
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.txt,.md,text/plain';
+    inp.style.display = 'none';
+    document.body.appendChild(inp);
+    pdfBtn.onclick = () => inp.click();
+    inp.onchange = () => {
+      const f = inp.files && inp.files[0];
+      if(!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        closeLibrary();
+        window.__pdfImported(f.name.replace(/\.[^.]+$/, ''), String(r.result || ''), 0);
+      };
+      r.readAsText(f, 'utf-8');
+      inp.value = '';
+    };
+  }
+
+  // Safari sesleri gecikmeli yüklüyor — geldiğinde listeyi tazele
+  try { speechSynthesis.getVoices(); } catch(e){}
+  setTimeout(() => { try { fillVoiceSelects(); syncVoiceUI(); } catch(e){} }, 800);
+})();
+</script>
+</body></html>
