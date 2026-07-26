@@ -216,106 +216,228 @@
   <div id="viewport"><div id="track"></div></div>
   <div id="droplay">
     <div class="big">&#128196;</div>
-    <div>Bırak, yazıya çevireyim</div>
-    <div class="sub2">PDF veya metin dosyası · cümlelere bölüp akan hikâye yaparım</div>
+    <div data-i18n="drop.t">Bırak, yazıya çevireyim</div>
+    <div class="sub2" data-i18n="drop.s">PDF veya metin dosyası · cümlelere bölüp akan hikâye yaparım</div>
   </div>
   <div id="tip"></div>
   <div id="editor">
-    <h2>Kendi Hikâyeni Ekle</h2>
-    <div class="sub">Her satır bir cümle. İngilizce ve Türkçe satırlar sırayla eşleşir; kaydedince altında çevirisiyle akmaya başlar. İnternet varsa "Otomatik Çevir" Türkçeyi doldurur, sonra istediğin gibi düzeltebilirsin.</div>
-    <label>Başlık</label>
-    <input id="cTitle" placeholder="Örn: My Weekend" maxlength="60">
-    <label>İngilizce metin (her satıra bir cümle)</label>
+    <h2 data-i18n="ed.t">Kendi Hikâyeni Ekle</h2>
+    <div class="sub" data-i18n="ed.s">Her satır bir cümle. İngilizce ve Türkçe satırlar sırayla eşleşir; kaydedince altında çevirisiyle akmaya başlar. İnternet varsa "Otomatik Çevir" Türkçeyi doldurur, sonra istediğin gibi düzeltebilirsin.</div>
+    <label data-i18n="ed.lt">Başlık</label>
+    <input id="cTitle" placeholder="Örn: My Weekend" data-i18n-ph="ed.pht" maxlength="60">
+    <label data-i18n="ed.le">İngilizce metin (her satıra bir cümle)</label>
     <textarea id="cEn" placeholder="I woke up early.&#10;I made a big breakfast.&#10;Then I called my friend."></textarea>
     <div class="erow">
-      <button class="btn" id="autoBtn">&#127760; Otomatik Çevir (EN&rarr;TR)</button>
+      <button class="btn" id="autoBtn" data-i18n="ed.auto">&#127760; Otomatik Çevir (EN&rarr;TR)</button>
       <span id="status"></span>
     </div>
-    <label>Türkçe çeviri (satırlar eşleşir)</label>
+    <label data-i18n="ed.ltr">Türkçe çeviri (satırlar eşleşir)</label>
     <textarea id="cTr" placeholder="Erken uyandım.&#10;Büyük bir kahvaltı yaptım.&#10;Sonra arkadaşımı aradım."></textarea>
     <div class="erow">
-      <button class="btn" id="saveBtn" style="background:#7cc4ff;color:#0d1017;border-color:#7cc4ff;font-weight:700">Kaydet ve Akıt</button>
-      <button class="btn" id="cancelBtn">Kapat</button>
+      <button class="btn" id="saveBtn" style="background:#7cc4ff;color:#0d1017;border-color:#7cc4ff;font-weight:700" data-i18n="ed.save">Kaydet ve Akıt</button>
+      <button class="btn" id="cancelBtn" data-i18n="ed.close">Kapat</button>
     </div>
   </div>
   <div id="library">
-    <div class="libhead"><h2>Kitaplığım</h2><button class="x" id="libClose">&#10005;</button></div>
-    <div class="sub">Eklediğin hikâyeler burada durur. Birine bas → o hikâye akmaya başlar. PDF'i doğrudan pencereye sürükleyip bırakabilirsin.</div>
+    <div class="libhead"><h2 data-i18n="lib.t">Kitaplığım</h2><button class="x" id="libClose">&#10005;</button></div>
+    <div class="sub" data-i18n="lib.s">Eklediğin hikâyeler burada durur. Birine bas → o hikâye akmaya başlar. PDF'i doğrudan pencereye sürükleyip bırakabilirsin.</div>
     <div class="librow">
-      <button class="btn" id="libNew">&#9998; Yeni Hikâye</button>
-      <button class="btn" id="libPdf">&#128196; PDF'ten Al</button>
-      <button class="btn" id="libAll">&#128256; Hepsi (karışık)</button>
-      <button class="btn" id="libBackup">&#8617; Yedekler</button>
+      <button class="btn" id="libNew" data-i18n="lib.new">&#9998; Yeni Hikâye</button>
+      <button class="btn" id="libPdf" data-i18n="lib.pdf">&#128196; PDF'ten Al</button>
+      <button class="btn" id="libAll" data-i18n="lib.all">&#128256; Hepsi (karışık)</button>
+      <button class="btn" id="libBackup" data-i18n="lib.bk">&#8617; Yedekler</button>
     </div>
     <div id="libList"></div>
   </div>
   <div id="voice">
-    <div class="libhead"><h2>Seslendirme</h2><button class="x" id="voiceClose">&#10005;</button></div>
-    <div class="sub">Hikâyeyi sesli okur; okunan satır ortada tutulur ve akış sesin hızına uyar. Bir satıra tıklarsan oradan devam eder.</div>
+    <div class="libhead"><h2 data-i18n="v.t">Seslendirme</h2><button class="x" id="voiceClose">&#10005;</button></div>
+    <div class="sub" data-i18n="v.s">Hikâyeyi sesli okur; okunan satır ortada tutulur ve akış sesin hızına uyar. Bir satıra tıklarsan oradan devam eder.</div>
     <button class="btn big-btn" id="narrToggle">&#9654; Seslendirmeyi Başlat</button>
     <div class="vrow">
-      <span class="lbl">Okunacak</span>
-      <button class="chip vmode" data-m="en">&Uuml;st sat&#305;r</button>
-      <button class="chip vmode" data-m="tr">Alt sat&#305;r</button>
-      <button class="chip vmode" data-m="both">&#304;kisi</button>
+      <span class="lbl" data-i18n="v.ui">Arayüz dili</span>
+      <button class="chip uilang" data-u="tr">Türkçe</button>
+      <button class="chip uilang" data-u="en">English</button>
     </div>
     <div class="vrow">
-      <span class="lbl">Dil</span>
+      <span class="lbl" data-i18n="v.read">Okunacak</span>
+      <button class="chip vmode" data-m="en" data-i18n="v.top">&Uuml;st sat&#305;r</button>
+      <button class="chip vmode" data-m="tr" data-i18n="v.bot">Alt sat&#305;r</button>
+      <button class="chip vmode" data-m="both" data-i18n="v.both">&#304;kisi</button>
+    </div>
+    <div class="vrow">
+      <span class="lbl" data-i18n="v.lang">Ses dili</span>
       <select id="vLang"></select>
     </div>
     <div class="vrow">
-      <span class="lbl">Ses</span>
-      <button class="chip vgen" data-g="female">Kad&#305;n</button>
-      <button class="chip vgen" data-g="male">Erkek</button>
+      <span class="lbl" data-i18n="v.voice">Ses</span>
+      <button class="chip vgen" data-g="female" data-i18n="v.fem">Kad&#305;n</button>
+      <button class="chip vgen" data-g="male" data-i18n="v.male">Erkek</button>
     </div>
     <div class="vrow">
-      <span class="lbl">Hız</span>
+      <span class="lbl" data-i18n="v.rate">Hız</span>
       <input type="range" id="vRate" min="0.8" max="2" step="0.05">
       <span class="val" id="vRateVal">1&times;</span>
     </div>
     <div class="vrow">
-      <span class="lbl">Ton</span>
+      <span class="lbl" data-i18n="v.pitch">Ton</span>
       <input type="range" id="vTrim" min="0.7" max="1.3" step="0.02">
       <span class="val" id="vTrimVal">1.00</span>
     </div>
     <div class="vrow">
-      <span class="lbl">Ses se&ccedil;imi</span>
+      <span class="lbl" data-i18n="v.pick">Ses se&ccedil;imi</span>
       <select id="vVoice"></select>
     </div>
     <div class="vrow">
-      <button class="btn" id="vTest">&#128264; Dene</button>
-      <span class="hint" style="text-align:left">Hız: akarken &minus; / + tuşları da ses hızını değiştirir</span>
+      <button class="btn" id="vTest" data-i18n="v.test">&#128264; Dene</button>
+      <span class="hint" style="text-align:left" data-i18n="v.hint">Hız: akarken &minus; / + tuşları da ses hızını değiştirir</span>
     </div>
     <div class="note" id="vNote"></div>
     <div class="vrow" id="vGetRow" style="display:none; margin-top:10px">
-      <button class="btn" id="vGetVoices">&#11015; Ses İndirme Ayarlarını Aç</button>
-      <button class="btn" id="vRefresh">&#8635; Sesleri Yenile</button>
+      <button class="btn" id="vGetVoices" data-i18n="v.get">&#11015; Ses İndirme Ayarlarını Aç</button>
+      <button class="btn" id="vRefresh" data-i18n="v.ref">&#8635; Sesleri Yenile</button>
     </div>
   </div>
   </div>
   <div id="toast"></div>
   <div id="bar">
     <div class="brow">
-      <button class="btn play" id="playBtn" title="Duraklat/Oynat">&#9208;</button>
-      <button class="btn" id="slower" title="Yavaşlat">&minus;</button>
-      <button class="btn" id="faster" title="Hızlandır">+</button>
-      <button class="btn" id="shuffleBtn" title="Karıştır">&#8635;</button>
-      <span class="hint" id="hint">kelimeye gel &middot; &#8597; geri kaydır</span>
-      <button class="btn" id="narrBtn" title="Sesli okumayı aç/kapat (S)">&#128266;</button>
-      <button class="btn" id="voiceBtn" title="Seslendirme ayarları">Ses</button>
+      <button class="btn play" id="playBtn" data-i18n-title="tip.play" title="Duraklat/Oynat">&#9208;</button>
+      <button class="btn" id="slower" data-i18n-title="tip.slow" title="Yavaşlat">&minus;</button>
+      <button class="btn" id="faster" data-i18n-title="tip.fast" title="Hızlandır">+</button>
+      <button class="btn" id="shuffleBtn" data-i18n-title="tip.shuf" title="Karıştır">&#8635;</button>
+      <span class="hint" id="hint" data-i18n="bar.hint">kelimeye gel &middot; &#8597; geri kaydır</span>
+      <button class="btn" id="narrBtn" data-i18n-title="tip.narr" title="Sesli okumayı aç/kapat (S)">&#128266;</button>
+      <button class="btn" id="voiceBtn" title="Seslendirme ayarları" data-i18n-title="tip.vset" data-i18n="bar.voice">Ses</button>
     </div>
     <div class="brow">
       <div class="chips">
-        <button class="chip on" data-lv="all">Karışık</button>
+        <button class="chip on" data-lv="all" data-i18n="chip.all">Karışık</button>
         <button class="chip" data-lv="a1">A1</button>
         <button class="chip" data-lv="a2">A2</button>
         <button class="chip" data-lv="b1">B1</button>
-        <button class="chip" data-lv="custom">Benim</button>
+        <button class="chip" data-lv="custom" data-i18n="chip.mine">Benim</button>
       </div>
-      <button class="btn" id="addBtn" title="Kendi hikâyeni ekle">&#9998; Ekle</button>
+      <button class="btn" id="addBtn" title="Kendi hikâyeni ekle" data-i18n-title="tip.add" data-i18n="bar.add">&#9998; Ekle</button>
     </div>
   </div>
 <script>
+
+/* ---------- Arayüz dili / Interface language ---------- */
+const I18N = {
+  tr: {
+    "drop.t":"Bırak, yazıya çevireyim", "drop.s":"PDF veya metin dosyası · cümlelere bölüp akan hikâye yaparım",
+    "ed.t":"Kendi Hikâyeni Ekle",
+    "ed.s":"Her satır bir cümle. Üst ve alt satırlar sırayla eşleşir; kaydedince altında çevirisiyle akmaya başlar. İnternet varsa “Otomatik Çevir” alt satırları doldurur.",
+    "ed.lt":"Başlık", "ed.le":"Metin (her satıra bir cümle)", "ed.auto":"🌐 Otomatik Çevir (EN→TR)",
+    "ed.ltr":"Çeviri (satırlar eşleşir)", "ed.save":"Kaydet ve Akıt", "ed.close":"Kapat", "ed.pht":"Örn: My Weekend",
+    "ed.needEn":"En az bir cümle gir.", "ed.needEn2":"Önce üst satırlara metni gir.",
+    "ed.translating":"Çevriliyor… ", "ed.done1":"Çeviri hazır (", "ed.done2":" cümle) — istersen düzelt, sonra kaydet.",
+    "ed.fail":"Otomatik çeviri başarısız (internet gerekiyor). Çeviriyi elle yazabilirsin.",
+    "lib.t":"Kitaplığım", "lib.s":"Eklediğin hikâyeler burada durur. Birine bas → o hikâye akmaya başlar. Dosyayı doğrudan pencereye sürükleyip bırakabilirsin.",
+    "lib.new":"✎ Yeni Hikâye", "lib.pdf":"📄 PDF'ten Al", "lib.all":"🔀 Hepsi (karışık)", "lib.bk":"↩ Yedekler",
+    "lib.empty":"Henüz kendi hikâyen yok.<br>Yukarıdan “Yeni Hikâye” ile ekle.",
+    "card.open":"▶ Aç", "card.edit":"✎ Düzenle", "card.del":"🗑 Sil", "card.sure":"Emin misin?", "card.sent":" cümle · ",
+    "empty.t1":"Henüz kendi hikâyen yok", "empty.t2":"Metnini ve çevirisini ekle,<br>otomatik olarak altında çevirisiyle aksın.",
+    "empty.add":"✎ Hikâye Ekle", "badge.mine":"BENİM", "story.default":"Benim Hikâyem", "story.custom":"Özel hikâye",
+    "v.t":"Seslendirme", "v.s":"Hikâyeyi sesli okur; okunan satır ortada tutulur ve akış sesin hızına uyar. Bir satıra dokunursan oradan devam eder.",
+    "v.ui":"Arayüz dili", "v.read":"Okunacak", "v.top":"Üst satır", "v.bot":"Alt satır", "v.both":"İkisi",
+    "v.lang":"Ses dili", "v.voice":"Ses", "v.fem":"Kadın", "v.male":"Erkek", "v.rate":"Hız", "v.pitch":"Ton",
+    "v.pick":"Ses seçimi", "v.test":"🔈 Dene", "v.hint":"Hız: akarken − / + tuşları da ses hızını değiştirir",
+    "v.get":"⬇ Ses İndirme Ayarlarını Aç", "v.ref":"↻ Sesleri Yenile",
+    "v.start":"▶ Seslendirmeyi Başlat", "v.stop":"⏹ Seslendirmeyi Durdur",
+    "bar.hint":"kelimeye gel · ↕ geri kaydır", "bar.voice":"Ses", "bar.add":"✎ Ekle",
+    "chip.all":"Karışık", "chip.mine":"Benim",
+    "tip.play":"Duraklat/Oynat", "tip.slow":"Yavaşlat", "tip.fast":"Hızlandır", "tip.shuf":"Karıştır",
+    "tip.narr":"Sesli okumayı aç/kapat (S)", "tip.narrOn":"Sesli okumayı aç (S)", "tip.narrOff":"Sesli okumayı kapat (S)",
+    "tip.vset":"Seslendirme ayarları", "tip.add":"Kendi hikâyeni ekle",
+    "lang.auto":"Otomatik (metne göre)", "auto.byLang":"Dile göre otomatik seçilir",
+    "auto.f":"Otomatik (kadın)", "auto.m":"Otomatik (erkek)",
+    "g.f":" · kadın", "g.m":" · erkek", "q.prem":" · premium", "q.enh":" · gelişmiş",
+    "flash.rate":"Ses hızı ", "flash.ref":"Ses listesi yenilendi",
+    "test.tr":"Merhaba, hikâyeni işte böyle okuyacağım.", "test.en":"Hello, this is how I will read your story.",
+    "note.path":"Ayarlar → Erişilebilirlik → Sözlü İçerik → Sesler → Türkçe",
+    "note.pathmac":"Sistem Ayarları → Erişilebilirlik → Sözlü İçerik → Sistem Sesi → Sesleri Yönet → Türkçe",
+    "note.none":"Bu cihazda hiç Türkçe ses yok. ", "note.get":" yolundan bir Türkçe ses indir.",
+    "note.head":"Şu an sadece temel kalite ses yüklü, o yüzden robotik duyuluyor. ",
+    "note.list":" yolundan indirebileceklerin: ",
+    "note.prem":"“Yelda (Premium)” (~490 MB) — şu ankinin çok daha doğal, insana yakın hali",
+    "note.cem":"“Cem” (~125 MB) — gerçek Türkçe erkek ses; indirilene kadar Erkek seçeneği tonu düşürerek taklit eder",
+    "note.tail":". İndirdikten sonra “Sesleri Yenile” de yeter, uygulamayı kapatmana gerek yok.",
+    "toast.pdfApp":"Dosya seçme yalnızca uygulamanın içinde çalışır.",
+    "toast.bkApp":"Yedekler yalnızca uygulamanın içinde görünür.",
+    "toast.del1":"“", "toast.del2":"” silindi — “↩ Yedekler” ile geri alabilirsin.",
+    "bk.sub":"Her satır, o tarihteki hikâye listesinin tamamıdır. Geri yükleyince mevcut liste onunla değişir (o hâl de yedeklenir).",
+    "bk.empty":"Henüz yedek yok.<br>Hikâye eklediğinde/sildiğinde önceki hâli buraya kopyalanır.",
+    "bk.back":"← Kitaplığa dön", "bk.restore":"↩ Geri Yükle", "bk.count":" hikâye · ",
+    "bk.bad":"Yedek bozuk görünüyor.", "bk.done1":"", "bk.done2":" hikâye geri yüklendi.",
+    "imp.pdf":"PDF'ten alındı · ", "imp.file":"Dosyadan alındı · ", "imp.page":" sayfa · ", "imp.sent":" cümle",
+    "imp.none":"Dosya okundu ama cümle çıkarılamadı.",
+    "imp.t1":"“", "imp.t2":"” eklendi: ", "imp.trunc":" (ilk ", "imp.hint":". Sesli okumak için 🔊"
+  },
+  en: {
+    "drop.t":"Drop it, I will turn it into text", "drop.s":"PDF or text file · split into sentences and set flowing",
+    "ed.t":"Add Your Own Story",
+    "ed.s":"One sentence per line. Top and bottom lines pair up in order; once saved it flows with its translation underneath. With internet, “Auto-translate” fills the bottom lines.",
+    "ed.lt":"Title", "ed.le":"Text (one sentence per line)", "ed.auto":"🌐 Auto-translate (EN→TR)",
+    "ed.ltr":"Translation (lines pair up)", "ed.save":"Save & Play", "ed.close":"Close", "ed.pht":"e.g. My Weekend",
+    "ed.needEn":"Enter at least one sentence.", "ed.needEn2":"Enter the text in the top box first.",
+    "ed.translating":"Translating… ", "ed.done1":"Translation ready (", "ed.done2":" sentences) — fix it if you like, then save.",
+    "ed.fail":"Auto-translate failed (needs internet). You can type the translation yourself.",
+    "lib.t":"My Library", "lib.s":"Your stories live here. Tap one → it starts flowing. You can also drop a file straight onto the window.",
+    "lib.new":"✎ New Story", "lib.pdf":"📄 From PDF", "lib.all":"🔀 All (shuffled)", "lib.bk":"↩ Backups",
+    "lib.empty":"No stories of your own yet.<br>Add one with “New Story” above.",
+    "card.open":"▶ Open", "card.edit":"✎ Edit", "card.del":"🗑 Delete", "card.sure":"Are you sure?", "card.sent":" sentences · ",
+    "empty.t1":"No stories of your own yet", "empty.t2":"Add your text and its translation,<br>and it will flow with the translation underneath.",
+    "empty.add":"✎ Add Story", "badge.mine":"MINE", "story.default":"My Story", "story.custom":"Own story",
+    "v.t":"Narration", "v.s":"Reads the story aloud; the current line stays centered and the flow follows the voice. Tap a line to continue from there.",
+    "v.ui":"Interface", "v.read":"Read", "v.top":"Top line", "v.bot":"Bottom line", "v.both":"Both",
+    "v.lang":"Voice language", "v.voice":"Voice", "v.fem":"Female", "v.male":"Male", "v.rate":"Speed", "v.pitch":"Pitch",
+    "v.pick":"Pick a voice", "v.test":"🔈 Test", "v.hint":"Speed: − / + also change the voice speed while flowing",
+    "v.get":"⬇ Open Voice Download Settings", "v.ref":"↻ Refresh Voices",
+    "v.start":"▶ Start Narration", "v.stop":"⏹ Stop Narration",
+    "bar.hint":"hover a word · ↕ scroll back", "bar.voice":"Voice", "bar.add":"✎ Add",
+    "chip.all":"Mixed", "chip.mine":"Mine",
+    "tip.play":"Pause/Play", "tip.slow":"Slower", "tip.fast":"Faster", "tip.shuf":"Shuffle",
+    "tip.narr":"Toggle narration (S)", "tip.narrOn":"Start narration (S)", "tip.narrOff":"Stop narration (S)",
+    "tip.vset":"Narration settings", "tip.add":"Add your own story",
+    "lang.auto":"Automatic (from the text)", "auto.byLang":"Chosen automatically per language",
+    "auto.f":"Automatic (female)", "auto.m":"Automatic (male)",
+    "g.f":" · female", "g.m":" · male", "q.prem":" · premium", "q.enh":" · enhanced",
+    "flash.rate":"Voice speed ", "flash.ref":"Voice list refreshed",
+    "test.tr":"Merhaba, hikâyeni işte böyle okuyacağım.", "test.en":"Hello, this is how I will read your story.",
+    "note.path":"Settings → Accessibility → Spoken Content → Voices → Turkish",
+    "note.pathmac":"System Settings → Accessibility → Spoken Content → System Voice → Manage Voices → Turkish",
+    "note.none":"This device has no Turkish voice. ", "note.get":" — download a Turkish voice there.",
+    "note.head":"Only basic-quality voices are installed, which is why it sounds robotic. ",
+    "note.list":" — what you can download: ",
+    "note.prem":"“Yelda (Premium)” (~490 MB) — a far more natural version of the current voice",
+    "note.cem":"“Cem” (~125 MB) — a real Turkish male voice; until then Male just lowers the pitch",
+    "note.tail":". After downloading, “Refresh Voices” is enough — no need to restart the app.",
+    "toast.pdfApp":"Picking files only works inside the app.",
+    "toast.bkApp":"Backups are only available inside the app.",
+    "toast.del1":"“", "toast.del2":"” deleted — you can restore it from “↩ Backups”.",
+    "bk.sub":"Each row is the whole story list as it was at that time. Restoring replaces the current list (which is backed up too).",
+    "bk.empty":"No backups yet.<br>Whenever you add or delete a story, the previous state is copied here.",
+    "bk.back":"← Back to library", "bk.restore":"↩ Restore", "bk.count":" stories · ",
+    "bk.bad":"That backup looks corrupted.", "bk.done1":"Restored ", "bk.done2":" stories.",
+    "imp.pdf":"From PDF · ", "imp.file":"From file · ", "imp.page":" pages · ", "imp.sent":" sentences",
+    "imp.none":"The file was read but no sentences could be extracted.",
+    "imp.t1":"“", "imp.t2":"” added: ", "imp.trunc":" (first ", "imp.hint":". Tap 🔊 to hear it"
+  }
+};
+let UI = 'tr';
+function t(k){
+  const d = I18N[UI] || I18N.tr;
+  return (d[k] !== undefined) ? d[k] : (I18N.tr[k] !== undefined ? I18N.tr[k] : k);
+}
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(e => { e.innerHTML = t(e.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-title]').forEach(e => { e.title = t(e.dataset.i18nTitle); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(e => { e.placeholder = t(e.dataset.i18nPh); });
+  document.querySelectorAll('.uilang').forEach(c => c.classList.toggle('on', c.dataset.u === UI));
+  document.documentElement.lang = UI;
+}
+
 const STORIES = [
   { lv:"a1", title:"Lucy and Her Dog", ttr:"Lucy ve Köpeği", lines:[
     ["Lucy is a little girl.","Lucy küçük bir kızdır."],
@@ -573,18 +695,26 @@ function guessGender(n){
   if(MAL_NAMES.some(x => n.indexOf(x) >= 0)) return 'male';
   return '';
 }
+// Tarayıcıda listeyi kirleten şaka/robot sesler (native tarafta cinsiyeti bildirilmediği için elenirler)
+const SAKA_SESLER = ['eddy','flo','grandma','grandpa','reed','rocko','sandy','shelley','albert',
+                     'bad news','bahh','bells','boing','bubbles','cellos','wobble','good news',
+                     'jester','junior','kathy','organ','superstar','ralph','trinoids','whisper','zarvox'];
 function allVoices(){
   if(NATIVE_VOICES.length) return NATIVE_VOICES;
   try {
+    // TÜM diller (yalnız tr/en değil) — cihazda hangi sesler varsa dil listesine girer
     return (speechSynthesis.getVoices() || [])
-      .filter(v => /^(tr|en)/i.test(v.lang || ''))
-      .map(v => ({ id:v.voiceURI, name:v.name, lang:v.lang, gender:guessGender(v.name) }));
+      .filter(v => {
+        const n = (v.name || '').toLowerCase();
+        return (v.lang || '') && !SAKA_SESLER.some(x => n.indexOf(x) >= 0);
+      })
+      .map(v => ({ id:v.voiceURI, name:v.name, lang:v.lang, gender:guessGender(v.name), quality:'' }));
   } catch(e){ return []; }
 }
 // lang:'auto' → metne bakıp karar ver; yoksa kullanıcının seçtiği dil (ör. 'de-DE')
 // voiceByLang → dil başına seçilen ses: { tr:'…Yelda', en:'…Daniel' }
 const V = { on:false, mode:'tr', gender:'female', rate:1.0, trim:1.0,
-            lang:'auto', voiceByLang:{}, trVoice:'', enVoice:'' };
+            lang:'auto', voiceByLang:{}, trVoice:'', enVoice:'', ui:'' };
 (function(){
   let saved = null;
   try {
@@ -595,6 +725,9 @@ const V = { on:false, mode:'tr', gender:'female', rate:1.0, trim:1.0,
   if(!V.voiceByLang || typeof V.voiceByLang !== 'object') V.voiceByLang = {};
   if(V.trVoice && !V.voiceByLang.tr) V.voiceByLang.tr = V.trVoice;      // eski ayarları taşı
   if(V.enVoice && !V.voiceByLang.en) V.voiceByLang.en = V.enVoice;
+  // Arayüz dili: kullanıcı seçtiyse o, yoksa cihazın diline göre
+  UI = (V.ui === 'tr' || V.ui === 'en') ? V.ui
+     : ((navigator.language || 'tr').toLowerCase().indexOf('tr') === 0 ? 'tr' : 'en');
 })();
 function persistVoice(){
   const j = JSON.stringify(V);
@@ -649,29 +782,29 @@ function stopSpeak(){
 function speakOne(text, lang, onEnd){
   resetSpeak();      // native tarafta yeni konuşma zaten öncekini keser
   const id = ++speakId;
-  const t = (text || '').trim();
+  const metin = (text || '').trim();
   const finish = () => {
     if(id !== speakId) return;
     speakDone = null;
     if(speakTimer){ clearTimeout(speakTimer); speakTimer = null; }
     if(onEnd) onEnd();
   };
-  if(!t){ speakTimer = setTimeout(finish, 150); return; }        // boş çeviri satırında takılma
+  if(!metin){ speakTimer = setTimeout(finish, 150); return; }    // boş çeviri satırında takılma
   speakDone = finish;
   const kod = tamKod(lang);
   const v = pickVoice(kod);
-  const est = 900 + t.length * 80 / Math.max(0.5, V.rate);
+  const est = 900 + metin.length * 80 / Math.max(0.5, V.rate);
   speakTimer = setTimeout(finish, est * 2 + 1500);               // ses hiç gelmezse akış kilitlenmesin
   if(NATIVE_TTS){
     try {
       window.webkit.messageHandlers.tts.postMessage({
-        text:t, id:id, voice:(v ? v.id : ''), lang:kod,
+        text:metin, id:id, voice:(v ? v.id : ''), lang:kod,
         rate:nativeRate(V.rate), pitch:pitchFor(v)
       });
     } catch(e){ finish(); }
   } else {
     try {
-      const u = new SpeechSynthesisUtterance(t);
+      const u = new SpeechSynthesisUtterance(metin);
       u.lang = kod;
       u.rate = Math.max(0.5, Math.min(2, V.rate));
       u.pitch = pitchFor(v);
@@ -691,9 +824,9 @@ window.__ttsEnd = function(id){ if(id === speakId && speakDone) speakDone(); }; 
 const TR_WORDS = ['bir','ve','için','ama','çok','ben','sen','bu','şu','gibi','daha','kadar','sonra',
                   'değil','var','yok','ile','çünkü','her','şey','ne','mi','de','da','beni','bana',
                   'onu','onun','biz','siz','olarak','oldu','dedi','diye','ki','ise','hem','ya'];
-function looksTurkish(t){
-  if(/[çğıöşüÇĞİÖŞÜ]/.test(t)) return true;
-  const w = t.toLowerCase().split(/[^a-zçğıöşü]+/).filter(Boolean);
+function looksTurkish(metin){
+  if(/[çğıöşüÇĞİÖŞÜ]/.test(metin)) return true;
+  const w = metin.toLowerCase().split(/[^a-zçğıöşü]+/).filter(Boolean);
   let n = 0;
   for(const x of w){ if(TR_WORDS.indexOf(x) >= 0) n++; }
   return n >= 2;
@@ -731,7 +864,7 @@ function shuffle(arr){
 }
 
 function storyHTML(s){
-  const badge = s.lv === 'custom' ? 'BENİM' : s.lv.toUpperCase();
+  const badge = s.lv === 'custom' ? t('badge.mine') : s.lv.toUpperCase();
   let h = '<div class="head ' + s.lv + '">'
         + '<div class="lv">' + badge + '</div>'
         + '<div class="en">' + esc(s.title) + '</div>'
@@ -766,9 +899,9 @@ function build(){
     track.innerHTML =
       '<div class="empty">'
       + '<div class="big">&#9997;&#65039;</div>'
-      + '<div class="t1">Henüz kendi hikâyen yok</div>'
-      + '<div class="t2">İngilizce metnini ve Türkçe çevirisini ekle,<br>otomatik olarak altında çevirisiyle aksın.</div>'
-      + '<button class="btn" id="emptyAdd" style="height:30px">&#9998; Hikâye Ekle</button>'
+      + '<div class="t1">' + t('empty.t1') + '</div>'
+      + '<div class="t2">' + t('empty.t2') + '</div>'
+      + '<button class="btn" id="emptyAdd" style="height:30px">' + t('empty.add') + '</button>'
       + '</div>';
     const ea = document.getElementById('emptyAdd');
     if(ea) ea.onclick = openEditor;
@@ -954,13 +1087,13 @@ requestAnimationFrame(frame);
 window.addEventListener('resize', () => { if(seqH > 0 || track.scrollHeight > 0) measure(); });
 
 const hintEl = document.getElementById('hint');
-const HINT_DEFAULT = hintEl ? hintEl.textContent : '';
+function hintDefault(){ return t('bar.hint'); }
 let hintTimer = null;
 function flash(msg){
   if(!hintEl) return;
   hintEl.textContent = msg;
   if(hintTimer) clearTimeout(hintTimer);
-  hintTimer = setTimeout(() => { hintEl.textContent = HINT_DEFAULT; }, 1800);
+  hintTimer = setTimeout(() => { hintEl.textContent = hintDefault(); }, 1800);
 }
 
 playBtn.onclick = () => {
@@ -970,11 +1103,11 @@ playBtn.onclick = () => {
 };
 // Seslendirme açıkken −/+ ses hızını, kapalıyken akış hızını değiştirir
 document.getElementById('slower').onclick = () => {
-  if(narrating){ setRate(V.rate - 0.1); flash('Ses hızı ' + rateLabel()); }
+  if(narrating){ setRate(V.rate - 0.1); flash(t('flash.rate') + rateLabel()); }
   else { secPerLine = Math.min(secPerLine + 0.4, 5); recomputeSpeed(); }
 };
 document.getElementById('faster').onclick = () => {
-  if(narrating){ setRate(V.rate + 0.1); flash('Ses hızı ' + rateLabel()); }
+  if(narrating){ setRate(V.rate + 0.1); flash(t('flash.rate') + rateLabel()); }
   else { secPerLine = Math.max(secPerLine - 0.4, 0.8); recomputeSpeed(); }
 };
 document.getElementById('shuffleBtn').onclick = () => build();
@@ -996,7 +1129,7 @@ const cEn      = document.getElementById('cEn');
 const cTr      = document.getElementById('cTr');
 const statusEl = document.getElementById('status');
 
-function getLines(t){ return t.split(/\r?\n/).map(s => s.trim()).filter(Boolean); }
+function getLines(metin){ return metin.split(/\r?\n/).map(s => s.trim()).filter(Boolean); }
 function setStatus(m){ statusEl.textContent = m || ''; }
 
 // ---- Kitaplığım: özel hikâyeleri listele, birine basınca o hikâye açılır ----
@@ -1006,17 +1139,17 @@ function closeLibrary(){ library.style.display = 'none'; }
 function renderLibrary(){
   const box = document.getElementById('libList');
   if(!custom.length){
-    box.innerHTML = '<div class="libempty">Henüz kendi hikâyen yok.<br>Yukarıdan “Yeni Hikâye” ile ekle.</div>';
+    box.innerHTML = '<div class="libempty">' + t('lib.empty') + '</div>';
     return;
   }
   box.innerHTML = custom.map((c, i) =>
       '<div class="story-card" data-i="' + i + '">'
     + '<div class="st">' + esc(c.title) + '</div>'
-    + '<div class="sc">' + c.lines.length + ' cümle · ' + esc((c.lines[0] && c.lines[0][0]) || '') + '</div>'
+    + '<div class="sc">' + c.lines.length + t('card.sent') + esc((c.lines[0] && c.lines[0][0]) || '') + '</div>'
     + '<div class="acts">'
-    + '<button class="mini play" data-i="' + i + '">&#9654; Aç</button>'
-    + '<button class="mini edit" data-i="' + i + '">&#9998; Düzenle</button>'
-    + '<button class="mini del" data-i="' + i + '">&#128465; Sil</button>'
+    + '<button class="mini play" data-i="' + i + '">' + t('card.open') + '</button>'
+    + '<button class="mini edit" data-i="' + i + '">' + t('card.edit') + '</button>'
+    + '<button class="mini del" data-i="' + i + '">' + t('card.del') + '</button>'
     + '</div></div>'
   ).join('');
   box.querySelectorAll('.story-card').forEach(card => {
@@ -1028,10 +1161,10 @@ function renderLibrary(){
   box.querySelectorAll('.mini.del').forEach(b => b.onclick = () => {
     if(b.dataset.sure !== '1'){
       b.dataset.sure = '1';
-      b.textContent = 'Emin misin?';
+      b.textContent = t('card.sure');
       b.style.color = '#ff8a8a'; b.style.borderColor = '#ff8a8a';
       setTimeout(() => {
-        if(b.dataset.sure === '1'){ b.dataset.sure = '0'; b.textContent = '🗑 Sil'; b.style.color = ''; b.style.borderColor = ''; }
+        if(b.dataset.sure === '1'){ b.dataset.sure = '0'; b.textContent = t('card.del'); b.style.color = ''; b.style.borderColor = ''; }
       }, 4000);
       return;
     }
@@ -1041,7 +1174,7 @@ function renderLibrary(){
     persistCustom(); renderLibrary();
     customPick = null;
     if(lv === 'custom' || lv === 'all') build();
-    toast('“' + ad + '” silindi — “↩ Yedekler” ile geri alabilirsin.', 5000);
+    toast(t('toast.del1') + ad + t('toast.del2'), 5000);
   });
 }
 
@@ -1064,12 +1197,12 @@ document.getElementById('libNew').onclick = () => { closeLibrary(); openEditor()
 /* ---------- PDF → akan yazı ---------- */
 let toastTimer = null;
 function toast(msg, ms){
-  const t = document.getElementById('toast');
-  if(!t) return;
-  t.textContent = msg;
-  t.style.opacity = '1';
+  const el = document.getElementById('toast');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.opacity = '1';
   if(toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.style.opacity = '0'; }, ms || 3800);
+  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, ms || 3800);
 }
 window.__dropHint = function(show){
   const d = document.getElementById('droplay');
@@ -1109,12 +1242,12 @@ function cumlelereBol(s){
 // PDF metnini cümlelere böl: satır sonu tirelemesini birleştir, paragraf satırlarını
 // toparla, sayfa numaralarını at, çok uzun cümleleri virgülden yumuşak böl
 function splitSentences(text){
-  const t = String(text || '')
+  const ham = String(text || '')
     .replace(/\r/g, '')
     .replace(/\u00ad/g, '')
     .replace(/([a-zçğıöşü])-\n([a-zçğıöşü])/g, '$1$2');
   const out = [];
-  for(const para of t.split(/\n\s*\n/)){
+  for(const para of ham.split(/\n\s*\n/)){
     const satirlar = para.split('\n').map(x => x.trim())
       .filter(x => x && !/^[0-9ivxlcIVXLC.\-—•|\s]+$/.test(x));      // sayfa no / süs satırı
     if(!satirlar.length) continue;
@@ -1143,40 +1276,40 @@ function splitSentences(text){
 
 window.__pdfImported = function(title, text, sayfa){
   const cumleler = splitSentences(text);
-  if(!cumleler.length){ toast('PDF okundu ama cümle çıkarılamadı.', 5000); return; }
+  if(!cumleler.length){ toast(t('imp.none'), 5000); return; }
   const LIMIT = 4000;
   const kesildi = cumleler.length > LIMIT;
   const lines = cumleler.slice(0, LIMIT).map(c => [c, '']);
   custom.push({
     title: (title || 'PDF').slice(0, 60),
-    ttr: (sayfa ? "PDF'ten alındı · " + sayfa + ' sayfa · ' : 'Dosyadan alındı · ') + lines.length + ' cümle',
+    ttr: (sayfa ? t('imp.pdf') + sayfa + t('imp.page') : t('imp.file')) + lines.length + t('imp.sent'),
     lines: lines
   });
   persistCustom();
   playCustom(custom.length - 1);
-  toast('“' + (title || 'PDF') + '” eklendi: ' + lines.length + ' cümle'
-        + (kesildi ? ' (ilk ' + LIMIT + ')' : '') + '. Sesli okumak için 🔊', 5500);
+  toast(t('imp.t1') + (title || 'PDF') + t('imp.t2') + lines.length + t('imp.sent')
+        + (kesildi ? t('imp.trunc') + LIMIT + ')' : '') + t('imp.hint'), 5500);
 };
 
 /* ---------- Yedekler: her değişiklikten önceki hâl diske kopyalanır ---------- */
 document.getElementById('libBackup').onclick = () => {
   try { window.webkit.messageHandlers.listBackups.postMessage(''); }
-  catch(e){ toast('Yedekler yalnızca uygulamanın içinde görünür.', 3500); }
+  catch(e){ toast(t('toast.bkApp'), 3500); }
 };
 window.__backups = function(list){
   const box = document.getElementById('libList');
   if(!Array.isArray(list) || !list.length){
-    box.innerHTML = '<div class="libempty">Henüz yedek yok.<br>Hikâye eklediğinde/sildiğinde önceki hâli buraya kopyalanır.</div>'
-                  + '<div class="librow"><button class="btn" id="libBack">&#8592; Kitaplığa dön</button></div>';
+    box.innerHTML = '<div class="libempty">' + t('bk.empty') + '</div>'
+                  + '<div class="librow"><button class="btn" id="libBack">' + t('bk.back') + '</button></div>';
   } else {
-    box.innerHTML = '<div class="sub">Her satır, o tarihteki hikâye listesinin tamamıdır. Geri yükleyince mevcut liste onunla değişir (o hâl de yedeklenir).</div>'
+    box.innerHTML = '<div class="sub">' + t('bk.sub') + '</div>'
       + list.map(b =>
           '<div class="story-card">'
         + '<div class="st">' + esc(b.tarih) + '</div>'
-        + '<div class="sc">' + b.sayi + ' hikâye · ' + esc((b.basliklar || []).join(', ')) + '</div>'
-        + '<div class="acts"><button class="mini geri" data-f="' + esc(b.file) + '">&#8617; Geri Yükle</button></div>'
+        + '<div class="sc">' + b.sayi + t('bk.count') + esc((b.basliklar || []).join(', ')) + '</div>'
+        + '<div class="acts"><button class="mini geri" data-f="' + esc(b.file) + '">' + t('bk.restore') + '</button></div>'
         + '</div>').join('')
-      + '<div class="librow"><button class="btn" id="libBack">&#8592; Kitaplığa dön</button></div>';
+      + '<div class="librow"><button class="btn" id="libBack">' + t('bk.back') + '</button></div>';
     box.querySelectorAll('.mini.geri').forEach(b => b.onclick = () => {
       try { window.webkit.messageHandlers.restoreBackup.postMessage(b.dataset.f); } catch(e){}
     });
@@ -1186,19 +1319,19 @@ window.__backups = function(list){
 };
 window.__restoreBackup = function(json){
   let list;
-  try { list = JSON.parse(json); } catch(e){ toast('Yedek bozuk görünüyor.', 4000); return; }
-  if(!Array.isArray(list)){ toast('Yedek bozuk görünüyor.', 4000); return; }
+  try { list = JSON.parse(json); } catch(e){ toast(t('bk.bad'), 4000); return; }
+  if(!Array.isArray(list)){ toast(t('bk.bad'), 4000); return; }
   custom = list;
   customPick = null;
   persistCustom();          // mevcut hâl de yedeklenir
   renderLibrary();
   if(lv === 'custom' || lv === 'all') build();
-  toast(list.length + ' hikâye geri yüklendi.', 4000);
+  toast(t('bk.done1') + list.length + t('bk.done2'), 4000);
 };
 
 document.getElementById('libPdf').onclick = () => {
   try { window.webkit.messageHandlers.pickPdf.postMessage(''); closeLibrary(); }
-  catch(e){ toast('PDF seçme yalnızca uygulamanın içinde çalışır.', 3500); }
+  catch(e){ toast(t('toast.pdfApp'), 3500); }
 };
 
 // ---- Editör: yeni ekle / var olanı düzenle ----
@@ -1211,10 +1344,10 @@ document.getElementById('cancelBtn').onclick = () => { closeEditor(); openLibrar
 document.getElementById('saveBtn').onclick = () => {
   const en = getLines(cEn.value);
   const tr = getLines(cTr.value);
-  if(!en.length){ setStatus('En az bir İngilizce cümle gir.'); return; }
+  if(!en.length){ setStatus(t('ed.needEn')); return; }
   const story = {
-    title: (cTitle.value.trim() || 'Benim Hikâyem'),
-    ttr:   'Özel hikâye',
+    title: (cTitle.value.trim() || t('story.default')),
+    ttr:   t('story.custom'),
     lines: en.map((e, i) => [e, tr[i] || ''])
   };
   let idx;
@@ -1266,16 +1399,16 @@ async function translateLines(enLines, onProgress){
 
 document.getElementById('autoBtn').onclick = async () => {
   const en = getLines(cEn.value);
-  if(!en.length){ setStatus('Önce İngilizce cümleleri gir.'); return; }
+  if(!en.length){ setStatus(t('ed.needEn2')); return; }
   const btn = document.getElementById('autoBtn');
   btn.disabled = true;
-  setStatus('Çevriliyor… 0/' + en.length);
+  setStatus(t('ed.translating') + '0/' + en.length);
   try {
-    const tr = await translateLines(en, (d, t) => setStatus('Çevriliyor… ' + d + '/' + t));
+    const tr = await translateLines(en, (d, n) => setStatus(t('ed.translating') + d + '/' + n));
     cTr.value = tr.join('\n');
-    setStatus('Çeviri hazır (' + en.length + ' cümle) — istersen düzelt, sonra kaydet.');
+    setStatus(t('ed.done1') + en.length + t('ed.done2'));
   } catch(e) {
-    setStatus('Otomatik çeviri başarısız (internet gerekiyor). Türkçeyi elle yazabilirsin.');
+    setStatus(t('ed.fail'));
   } finally {
     btn.disabled = false;
   }
@@ -1298,7 +1431,10 @@ function fillLangSelect(){
   const sel = document.getElementById('vLang'); if(!sel) return;
   const kodlar = [];
   allVoices().forEach(v => { if(v.lang && kodlar.indexOf(v.lang) < 0) kodlar.push(v.lang); });
-  sel.innerHTML = '<option value="auto">Otomatik (metne göre)</option>'
+  // Önce Türkçe, sonra İngilizce, sonra diğerleri alfabetik (49 dil arasında aramak kolay olsun)
+  const oncelik = k => k.toLowerCase().indexOf('tr') === 0 ? 0 : (k.toLowerCase().indexOf('en') === 0 ? 1 : 2);
+  kodlar.sort((a, b) => (oncelik(a) - oncelik(b)) || dilAdi(a).localeCompare(dilAdi(b), 'tr'));
+  sel.innerHTML = '<option value="auto">' + t('lang.auto') + '</option>'
     + kodlar.map(k => '<option value="' + esc(k) + '">' + esc(dilAdi(k)) + '</option>').join('');
   sel.value = V.lang || 'auto';
   if(sel.value !== (V.lang || 'auto')){ sel.value = 'auto'; V.lang = 'auto'; }   // dil artık yoksa
@@ -1307,17 +1443,17 @@ function fillVoiceSelects(){
   fillLangSelect();
   const sel = document.getElementById('vVoice'); if(!sel) return;
   if(!V.lang || V.lang === 'auto'){
-    sel.innerHTML = '<option value="">Dile göre otomatik seçilir</option>';
+    sel.innerHTML = '<option value="">' + t('auto.byLang') + '</option>';
     sel.value = ''; sel.disabled = true;
     return;
   }
   sel.disabled = false;
   const iki = V.lang.slice(0, 2).toLowerCase();
   const cur = (V.voiceByLang || {})[iki] || '';
-  sel.innerHTML = '<option value="">Otomatik (' + (V.gender === 'male' ? 'erkek' : 'kadın') + ')</option>'
+  sel.innerHTML = '<option value="">' + (V.gender === 'male' ? t('auto.m') : t('auto.f')) + '</option>'
     + voicesOf(iki).map(v => {
-        const g = v.gender === 'male' ? ' · erkek' : (v.gender === 'female' ? ' · kadın' : '');
-        const q = v.quality === 'premium' ? ' · premium' : (v.quality === 'enhanced' ? ' · gelişmiş' : '');
+        const g = v.gender === 'male' ? t('g.m') : (v.gender === 'female' ? t('g.f') : '');
+        const q = v.quality === 'premium' ? t('q.prem') : (v.quality === 'enhanced' ? t('q.enh') : '');
         return '<option value="' + esc(v.id) + '">' + esc(v.name) + ' (' + esc(v.lang) + ')' + g + q + '</option>';
       }).join('');
   sel.value = cur;
@@ -1326,17 +1462,13 @@ function fillVoiceSelects(){
 // Daha gerçekçi ses için ne indirilebilir? (macOS'un Türkçe ses paketleri)
 function voiceNote(){
   const tr = voicesOf('tr');
-  const yol = (window.__PLATFORM__ === 'ios')
-    ? 'Ayarlar → Erişilebilirlik → Sözlü İçerik → Sesler → Türkçe'
-    : 'Sistem Ayarları → Erişilebilirlik → Sözlü İçerik → Sistem Sesi → Sesleri Yönet → Türkçe';
-  if(!tr.length) return 'Bu Mac üzerinde hiç Türkçe ses yok. ' + yol + ' yolundan bir Türkçe ses indir.';
+  const yol = (window.__PLATFORM__ === 'ios') ? t('note.path') : t('note.pathmac');
+  if(!tr.length) return t('note.none') + yol + t('note.get');
   const eksik = [];
-  if(!tr.some(v => v.quality === 'premium' || v.quality === 'enhanced'))
-    eksik.push('“Yelda (Premium)” (~490 MB) — şu ankinin çok daha doğal, insana yakın hali');
-  if(!tr.some(v => v.gender === 'male'))
-    eksik.push('“Cem” (~125 MB) — gerçek Türkçe erkek ses; indirilene kadar Erkek seçeneği Yelda’nın tonunu düşürerek taklit eder');
+  if(!tr.some(v => v.quality === 'premium' || v.quality === 'enhanced')) eksik.push(t('note.prem'));
+  if(!tr.some(v => v.gender === 'male')) eksik.push(t('note.cem'));
   if(!eksik.length) return '';
-  return 'Şu an sadece temel kalite ses yüklü, o yüzden robotik duyuluyor. ' + yol + ' yolundan indirebileceklerin: ' + eksik.join(' · ') + '. İndirdikten sonra “Sesleri Yenile” de yeter, uygulamayı kapatmana gerek yok. (Siri sesleri elif/kaan daha da gerçekçi ama Apple onları uygulamalara açmıyor.)';
+  return t('note.head') + yol + t('note.list') + eksik.join(' · ') + t('note.tail');
 }
 function syncVoiceUI(){
   document.querySelectorAll('.vmode').forEach(c => c.classList.toggle('on', c.dataset.m === V.mode));
@@ -1344,14 +1476,14 @@ function syncVoiceUI(){
   const r = document.getElementById('vRate'), rv = document.getElementById('vRateVal');
   if(r) r.value = V.rate;
   if(rv) rv.textContent = rateLabel();
-  const t = document.getElementById('vTrim'), tv = document.getElementById('vTrimVal');
-  if(t) t.value = V.trim;
+  const tn = document.getElementById('vTrim'), tv = document.getElementById('vTrimVal');
+  if(tn) tn.value = V.trim;
   if(tv) tv.textContent = (Math.round(V.trim * 100) / 100).toFixed(2);
   const nt = document.getElementById('narrToggle');
-  if(nt) nt.textContent = narrating ? '⏹ Seslendirmeyi Durdur' : '▶ Seslendirmeyi Başlat';
+  if(nt) nt.textContent = narrating ? t('v.stop') : t('v.start');
   if(narrBtn){
     narrBtn.classList.toggle('on', narrating);
-    narrBtn.title = (narrating ? 'Sesli okumayı kapat' : 'Sesli okumayı aç') + ' (S)';
+    narrBtn.title = narrating ? t('tip.narrOff') : t('tip.narrOn');
   }
   const note = document.getElementById('vNote'), getRow = document.getElementById('vGetRow');
   const m = voiceNote();
@@ -1365,7 +1497,7 @@ document.getElementById('voiceBtn').onclick = () => {
   fillVoiceSelects(); syncVoiceUI();
   voicePanel.style.display = 'flex';
 };
-document.getElementById('vRefresh').onclick = () => { refreshVoices(); flash('Ses listesi yenilendi'); };
+document.getElementById('vRefresh').onclick = () => { refreshVoices(); flash(t('flash.ref')); };
 document.getElementById('vGetVoices').onclick = () => {
   try { window.webkit.messageHandlers.openVoiceSettings.postMessage(''); } catch(e){}
 };
@@ -1400,9 +1532,7 @@ document.getElementById('vVoice').onchange = e => {
 document.getElementById('vTest').onclick = () => {
   const kod = (V.lang && V.lang !== 'auto') ? V.lang : (V.mode === 'en' ? 'en' : 'tr');
   const iki = tamKod(kod).slice(0, 2);
-  speakOne(iki === 'tr' ? 'Merhaba, hikâyeni işte böyle okuyacağım.'
-         : iki === 'en' ? 'Hello, this is how I will read your story.'
-         : 'Test: 1, 2, 3.', kod);
+  speakOne(iki === 'tr' ? t('test.tr') : iki === 'en' ? t('test.en') : 'Test: 1, 2, 3.', kod);
 };
 try { speechSynthesis.onvoiceschanged = () => { fillVoiceSelects(); syncVoiceUI(); }; } catch(e){}
 
@@ -1412,12 +1542,24 @@ document.addEventListener('keydown', e => {
     [voicePanel, library, editor].forEach(p => { if(p) p.style.display = 'none'; });
     return;
   }
-  const t = (e.target && e.target.tagName) || '';
-  if(t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT') return;
+  const etiket = (e.target && e.target.tagName) || '';
+  if(etiket === 'INPUT' || etiket === 'TEXTAREA' || etiket === 'SELECT') return;
   if(e.key === 's' || e.key === 'S'){ setNarration(!narrating); e.preventDefault(); }
   else if(e.key === ' '){ playBtn.onclick(); e.preventDefault(); }
 });
 
+// Arayüz dili düğmeleri
+document.querySelectorAll('.uilang').forEach(c => c.onclick = () => {
+  UI = c.dataset.u;
+  V.ui = UI;
+  persistVoice();
+  applyI18n();
+  fillVoiceSelects(); syncVoiceUI();
+  build();                                   // rozetler/boş durum yeni dilde
+  if(library.style.display === 'flex') renderLibrary();
+});
+
+applyI18n();
 build();
 fillVoiceSelects();
 syncVoiceUI();
@@ -1443,8 +1585,11 @@ window.__PLATFORM__ = 'web';
   // PDF yerine düz metin dosyası yükleme (tarayıcıda PDF okuyucu yok)
   const pdfBtn = document.getElementById('libPdf');
   if(pdfBtn){
-    pdfBtn.textContent = '📄 Metin Dosyası';
-    pdfBtn.title = 'Bir .txt dosyası seç';
+    I18N.tr['lib.txt'] = '📄 Metin Dosyası';
+    I18N.en['lib.txt'] = '📄 Text file';
+    pdfBtn.dataset.i18n = 'lib.txt';          // dil değişince de doğru kalsın
+    pdfBtn.textContent = t('lib.txt');
+    pdfBtn.title = 'txt / md';
     const inp = document.createElement('input');
     inp.type = 'file';
     inp.accept = '.txt,.md,text/plain';
